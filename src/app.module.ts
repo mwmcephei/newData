@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { XlsxParserModule } from './xlsxParser/xlsxParser.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApiModule } from './api/api.module';
-import { SimpleAuthModule } from './simpleAuth/simpleAuth.module';
+//import { SimpleAuthModule } from './simpleAuth/simpleAuth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule } from '@nestjs/config';
 
@@ -21,7 +21,7 @@ import { ConfigModule } from '@nestjs/config';
     ),
     XlsxParserModule,
     ApiModule,
-    SimpleAuthModule,
+    //    SimpleAuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
