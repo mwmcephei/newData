@@ -17,4 +17,3 @@ export interface Artefact {
   achievement: string;
   work: string;
 }
-

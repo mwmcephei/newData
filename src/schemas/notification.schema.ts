@@ -5,7 +5,7 @@ export type NotificationDocument = Notification & Document;
 
 @Schema()
 export class Notification {
-
+  [x: string]: any;
   @Prop()
   title: string;
   @Prop()
@@ -20,10 +20,6 @@ export class Notification {
   seen: boolean;
   @Prop()
   notified: boolean;
-
-
-
-
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

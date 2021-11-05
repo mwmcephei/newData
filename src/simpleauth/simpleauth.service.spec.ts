@@ -1,15 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SimpleauthService } from './simpleauth.service';
+import { SimpleAuthService } from './simpleAuth.service';
+import { getModelToken } from '@nestjs/mongoose';
 
-describe('SimpleauthService', () => {
-  let service: SimpleauthService;
+describe('SimpleAuthService', () => {
+  let service: SimpleAuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SimpleauthService],
+      providers: [
+        SimpleAuthService,
+        { provide: getModelToken('User'), useValue: {} },
+      ],
     }).compile();
 
-    service = module.get<SimpleauthService>(SimpleauthService);
+    service = module.get<SimpleAuthService>(SimpleAuthService);
   });
 
   it('should be defined', () => {

@@ -17,115 +17,115 @@ const budgetDetail_schema_1 = require("./budgetDetail.schema");
 let MeasureTEMP = class MeasureTEMP {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "title", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "id", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "name", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "description", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "focusArea", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "focusAreaFull", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "time", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "lastUpdate", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "measureLead", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "measureSponsor", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "lineOrgSponsor", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "solutionManager", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "approved", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "spent", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "kpiName", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], MeasureTEMP.prototype, "help", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "actuals", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "target", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "risk", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "budget", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "artefact", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], MeasureTEMP.prototype, "kpiProgress", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], MeasureTEMP.prototype, "monthlySpendings", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], MeasureTEMP.prototype, "risks", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", budgetDetail_schema_1.BudgetDetail)
 ], MeasureTEMP.prototype, "budgetDetail", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", kpi_schema_1.KPI)
 ], MeasureTEMP.prototype, "kpiData", void 0);
 __decorate([
-    mongoose_1.Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'ArtefactTEMP' }),
+    (0, mongoose_1.Prop)({ type: [mongoose.Schema.Types.ObjectId], ref: 'ArtefactTEMP' }),
     __metadata("design:type", Array)
 ], MeasureTEMP.prototype, "artefacts", void 0);
 MeasureTEMP = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], MeasureTEMP);
 exports.MeasureTEMP = MeasureTEMP;
 exports.MeasureTEMPSchema = mongoose_1.SchemaFactory.createForClass(MeasureTEMP);

@@ -12,6 +12,7 @@ export declare class SheetTEMP {
     statusDate: string;
     budgetDate: string;
     kpiProgress: number;
+    monthNames: string[];
     measures: [MeasureTEMP];
 }
-export declare const SheetTEMPSchema: mongoose.Schema<mongoose.Document<SheetTEMP, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const SheetTEMPSchema: mongoose.Schema<mongoose.Document<SheetTEMP, any, any>, mongoose.Model<mongoose.Document<SheetTEMP, any, any>, any, any>, undefined, {}>;

@@ -64,15 +64,13 @@ export class MeasureTEMP {
   monthlySpendings: number[];
 
   @Prop()
-  risks: [
-    {
-      risk: string;
-      description: string;
-      criticality: string;
-      migration: string;
-      resolutionDate: string | number;
-    },
-  ];
+  risks: {
+    risk: string;
+    description: string;
+    criticality: string;
+    migration: string;
+    resolutionDate: string | number;
+  }[];
 
   @Prop()
   budgetDetail: BudgetDetail;

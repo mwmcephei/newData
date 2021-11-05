@@ -14,19 +14,19 @@ const mongoose_1 = require("@nestjs/mongoose");
 let BudgetTEMP = class BudgetTEMP {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], BudgetTEMP.prototype, "monthlySpendings", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], BudgetTEMP.prototype, "approvedBudgetPerMonth", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], BudgetTEMP.prototype, "year", void 0);
 BudgetTEMP = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], BudgetTEMP);
 exports.BudgetTEMP = BudgetTEMP;
 exports.BudgetTEMPSchema = mongoose_1.SchemaFactory.createForClass(BudgetTEMP);

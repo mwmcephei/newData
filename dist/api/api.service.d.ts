@@ -25,14 +25,11 @@ export declare class ApiService {
     getOverview(): Promise<Sheet>;
     getBudget(): Promise<Budget>;
     getPastBudgets(): Promise<PastBudget[]>;
-    lookAtNotifications(): Promise<Notification[]>;
-    getNotifications(all: any): Promise<Notification[]>;
-    setToNotified(result: any): Promise<void>;
-    setNotification(notification: any): Promise<Notification>;
-    checkNotifications(): Promise<NotificationStatus>;
-    filesChanged(): Promise<NotificationStatus[]>;
-    HandleFileUpload(originalname: any, targetFileName: any): Promise<boolean>;
-    createNotificationForFileChange(fileCategory: any): Promise<boolean>;
-    getUploadInfo(): Promise<Upload[]>;
-    datetimNow(): string;
+    setAllNotificationsToSeen(): Promise<Notification[]>;
+    getNotifications(all: boolean): Promise<Notification[]>;
+    setToNotified(result: Notification[]): Promise<void>;
+    checkForNewNotifications(): Promise<NotificationStatus> | undefined;
+    handleFileUpload(originalname: string, targetFileName: string): Promise<boolean>;
+    createNotificationForFileChange(fileCategory: string): Promise<void>;
+    filesInParseBuffer(): Promise<Upload[]>;
 }

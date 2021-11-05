@@ -1,3 +1,5 @@
+import { Upload } from './schemas/upload.schema';
+
 export type Measure = {
   _id: string;
   artefacts: Artefact[];
@@ -120,11 +122,15 @@ export type SheetType = {
   [key: string]: string | number;
 };
 
-
 export type PastBudget = {
-  title: string,
-  name: string,
-  budget: number,
-  category: string,
-  year: number
+  title: string;
+  name: string;
+  budget: number;
+  category: string;
+  year: number;
+};
+
+export interface ExistingFiles {
+  filesInBuffer: Upload[];
+  filesAlreadyParsed: string[];
 }

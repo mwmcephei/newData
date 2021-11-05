@@ -6,24 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SimpleauthModule = void 0;
+exports.SimpleAuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const user_schema_1 = require("../schemas/user.schema");
-const simpleauth_controller_1 = require("./simpleauth.controller");
-const simpleauth_service_1 = require("./simpleauth.service");
+const simpleAuth_controller_1 = require("./simpleAuth.controller");
+const simpleAuth_service_1 = require("./simpleAuth.service");
 const mongoose_1 = require("@nestjs/mongoose");
-let SimpleauthModule = class SimpleauthModule {
+let SimpleAuthModule = class SimpleAuthModule {
 };
-SimpleauthModule = __decorate([
-    common_1.Module({
-        imports: [
-            mongoose_1.MongooseModule.forFeature([
-                { name: 'User', schema: user_schema_1.UserSchema },
-            ]),
-        ],
-        controllers: [simpleauth_controller_1.SimpleauthController],
-        providers: [simpleauth_service_1.SimpleauthService]
+SimpleAuthModule = __decorate([
+    (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'User', schema: user_schema_1.UserSchema }])],
+        controllers: [simpleAuth_controller_1.SimpleAuthController],
+        providers: [simpleAuth_service_1.SimpleAuthService],
     })
-], SimpleauthModule);
-exports.SimpleauthModule = SimpleauthModule;
-//# sourceMappingURL=simpleauth.module.js.map
+], SimpleAuthModule);
+exports.SimpleAuthModule = SimpleAuthModule;
+//# sourceMappingURL=simpleAuth.module.js.map

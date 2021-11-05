@@ -1,13 +1,13 @@
-import { SimpleauthService } from './simpleauth.service';
+import { SimpleAuthService } from './simpleAuth.service';
 export declare class UserDataDto {
     username: string;
     password: string;
 }
-export declare class SimpleauthController {
-    private simpleauthService;
-    constructor(simpleauthService: SimpleauthService);
+export declare class SimpleAuthController {
+    private SimpleAuthService;
+    constructor(SimpleAuthService: SimpleAuthService);
     login(userData: UserDataDto): Promise<{
         login: boolean;
     }>;
-    parse(): void;
+    addUser(): Promise<void>;
 }

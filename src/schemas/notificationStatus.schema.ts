@@ -7,10 +7,7 @@ export type NotificationStatusDocument = NotificationStatus & Document;
 export class NotificationStatus {
   @Prop()
   change: boolean;
-
-
-
-
 }
 
-export const NotificationStatusSchema = SchemaFactory.createForClass(NotificationStatus);
+export const NotificationStatusSchema =
+  SchemaFactory.createForClass(NotificationStatus);

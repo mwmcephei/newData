@@ -22,7 +22,7 @@ const upload_schema_1 = require("../schemas/upload.schema");
 let ApiModule = class ApiModule {
 };
 ApiModule = __decorate([
-    common_1.Module({
+    (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: 'Sheet', schema: sheet_schema_1.SheetSchema },

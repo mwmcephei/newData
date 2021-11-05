@@ -6,4 +6,4 @@ export declare class Upload {
     date: string;
     ok: boolean;
 }
-export declare const UploadSchema: mongoose.Schema<mongoose.Document<Upload, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const UploadSchema: mongoose.Schema<mongoose.Document<Upload, any, any>, mongoose.Model<mongoose.Document<Upload, any, any>, any, any>, undefined, {}>;

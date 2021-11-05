@@ -14,15 +14,15 @@ const mongoose_1 = require("@nestjs/mongoose");
 let User = class User {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 User = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], User);
 exports.User = User;
 exports.UserSchema = mongoose_1.SchemaFactory.createForClass(User);

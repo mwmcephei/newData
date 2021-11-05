@@ -20,6 +20,9 @@ export class Sheet {
   progress: number;
 
   @Prop()
+  monthNames: string[];
+
+  @Prop()
   kpiPlans: string[];
   @Prop()
   kpiDates: string[];

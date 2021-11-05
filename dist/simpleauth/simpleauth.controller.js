@@ -12,43 +12,42 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SimpleauthController = exports.UserDataDto = void 0;
+exports.SimpleAuthController = exports.UserDataDto = void 0;
 const common_1 = require("@nestjs/common");
-const simpleauth_service_1 = require("./simpleauth.service");
+const simpleAuth_service_1 = require("./simpleAuth.service");
 class UserDataDto {
 }
 exports.UserDataDto = UserDataDto;
-let SimpleauthController = class SimpleauthController {
-    constructor(simpleauthService) {
-        this.simpleauthService = simpleauthService;
+let SimpleAuthController = class SimpleAuthController {
+    constructor(SimpleAuthService) {
+        this.SimpleAuthService = SimpleAuthService;
     }
     async login(userData) {
-        const success = await this.simpleauthService.login(userData.username, userData.password);
-        console.log(success);
+        const success = await this.SimpleAuthService.login(userData.username, userData.password);
         return {
-            login: success
+            login: success,
         };
     }
-    parse() {
-        return this.simpleauthService.addUser();
+    addUser() {
+        return this.SimpleAuthService.addUser();
     }
 };
 __decorate([
-    common_1.Post("login"),
-    __param(0, common_1.Body()),
+    (0, common_1.Post)('login'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UserDataDto]),
     __metadata("design:returntype", Promise)
-], SimpleauthController.prototype, "login", null);
+], SimpleAuthController.prototype, "login", null);
 __decorate([
-    common_1.Get('adduser'),
+    (0, common_1.Get)('adduser'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], SimpleauthController.prototype, "parse", null);
-SimpleauthController = __decorate([
-    common_1.Controller('simpleauth'),
-    __metadata("design:paramtypes", [simpleauth_service_1.SimpleauthService])
-], SimpleauthController);
-exports.SimpleauthController = SimpleauthController;
-//# sourceMappingURL=simpleauth.controller.js.map
+], SimpleAuthController.prototype, "addUser", null);
+SimpleAuthController = __decorate([
+    (0, common_1.Controller)('simpleAuth'),
+    __metadata("design:paramtypes", [simpleAuth_service_1.SimpleAuthService])
+], SimpleAuthController);
+exports.SimpleAuthController = SimpleAuthController;
+//# sourceMappingURL=simpleAuth.controller.js.map

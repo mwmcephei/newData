@@ -27,17 +27,15 @@ export declare class MeasureTEMP {
     artefact: number;
     kpiProgress: number;
     monthlySpendings: number[];
-    risks: [
-        {
-            risk: string;
-            description: string;
-            criticality: string;
-            migration: string;
-            resolutionDate: string | number;
-        }
-    ];
+    risks: {
+        risk: string;
+        description: string;
+        criticality: string;
+        migration: string;
+        resolutionDate: string | number;
+    }[];
     budgetDetail: BudgetDetail;
     kpiData: KPI;
     artefacts: [ArtefactTEMP];
 }
-export declare const MeasureTEMPSchema: mongoose.Schema<mongoose.Document<MeasureTEMP, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const MeasureTEMPSchema: mongoose.Schema<mongoose.Document<MeasureTEMP, any, any>, mongoose.Model<mongoose.Document<MeasureTEMP, any, any>, any, any>, undefined, {}>;

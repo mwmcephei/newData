@@ -16,8 +16,6 @@ export class PastBudget {
   category: string;
   @Prop()
   year: number;
-
-
 }
 
 export const PastBudgetSchema = SchemaFactory.createForClass(PastBudget);

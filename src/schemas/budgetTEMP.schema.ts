@@ -6,7 +6,7 @@ export type BudgetTEMPDocument = BudgetTEMP & Document;
 @Schema()
 export class BudgetTEMP {
   @Prop()
-  monthlySpendings: [number];
+  monthlySpendings: number[];
 
   @Prop()
   approvedBudgetPerMonth: number;

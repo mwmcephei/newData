@@ -14,35 +14,35 @@ const mongoose_1 = require("@nestjs/mongoose");
 let Notification = class Notification {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Notification.prototype, "title", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Notification.prototype, "body", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Notification.prototype, "time", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Notification.prototype, "type", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Notification.prototype, "measure", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Boolean)
 ], Notification.prototype, "seen", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Boolean)
 ], Notification.prototype, "notified", void 0);
 Notification = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], Notification);
 exports.Notification = Notification;
 exports.NotificationSchema = mongoose_1.SchemaFactory.createForClass(Notification);

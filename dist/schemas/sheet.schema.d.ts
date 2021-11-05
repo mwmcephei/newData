@@ -7,6 +7,7 @@ export declare class Sheet {
     totalBudget: number;
     overallStatus: number;
     progress: number;
+    monthNames: string[];
     kpiPlans: string[];
     kpiDates: string[];
     statusDate: string;
@@ -14,4 +15,4 @@ export declare class Sheet {
     kpiProgress: number;
     measures: [Measure];
 }
-export declare const SheetSchema: mongoose.Schema<mongoose.Document<Sheet, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const SheetSchema: mongoose.Schema<mongoose.Document<Sheet, any, any>, mongoose.Model<mongoose.Document<Sheet, any, any>, any, any>, undefined, {}>;

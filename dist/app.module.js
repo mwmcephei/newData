@@ -8,22 +8,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const xlsx_parser_module_1 = require("./xlsx-parser/xlsx-parser.module");
+const xlsxParser_module_1 = require("./xlsxParser/xlsxParser.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const api_module_1 = require("./api/api.module");
-const simpleauth_module_1 = require("./simpleauth/simpleauth.module");
+const simpleAuth_module_1 = require("./simpleAuth/simpleAuth.module");
 const platform_express_1 = require("@nestjs/platform-express");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
-    common_1.Module({
-        imports: [platform_express_1.MulterModule.register({
+    (0, common_1.Module)({
+        imports: [
+            platform_express_1.MulterModule.register({
                 dest: './uploads',
             }),
-            mongoose_1.MongooseModule.forRoot('mongodb+srv://pmo:pmo@cluster0.af8k1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'),
-            xlsx_parser_module_1.XlsxParserModule,
+            config_1.ConfigModule.forRoot(),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_CONNECTION_DEV_3),
+            xlsxParser_module_1.XlsxParserModule,
             api_module_1.ApiModule,
-            simpleauth_module_1.SimpleauthModule
+            simpleAuth_module_1.SimpleAuthModule,
         ],
     })
 ], AppModule);

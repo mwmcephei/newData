@@ -8,8 +8,14 @@ import { Measure, MeasureSchema } from '../schemas/measure.schema';
 import { Artefact, ArtefactSchema } from '../schemas/artefact.schema';
 import { Budget, BudgetSchema } from '../schemas/budget.schema';
 import { PastBudget, PastBudgetSchema } from '../schemas/pastBudget.schema';
-import { Notification, NotificationSchema } from '../schemas/notification.schema';
-import { NotificationStatus, NotificationStatusSchema } from '../schemas/notificationStatus.schema';
+import {
+  Notification,
+  NotificationSchema,
+} from '../schemas/notification.schema';
+import {
+  NotificationStatus,
+  NotificationStatusSchema,
+} from '../schemas/notificationStatus.schema';
 import { UploadSchema } from 'src/schemas/upload.schema';
 
 @Module({
@@ -28,4 +34,4 @@ import { UploadSchema } from 'src/schemas/upload.schema';
   controllers: [ApiController],
   providers: [ApiService],
 })
-export class ApiModule { }
+export class ApiModule {}

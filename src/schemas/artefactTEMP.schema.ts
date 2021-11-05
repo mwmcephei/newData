@@ -1,6 +1,5 @@
 import * as mongoose from 'mongoose';
 
-
 export const ArtefactTEMPSchema = new mongoose.Schema({
   id: { type: Number },
   description: { type: String },

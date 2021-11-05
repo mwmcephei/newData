@@ -10,4 +10,4 @@ export declare class KPI {
     plan3: number;
     plan4: number;
 }
-export declare const KPISchema: mongoose.Schema<mongoose.Document<KPI, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const KPISchema: mongoose.Schema<mongoose.Document<KPI, any, any>, mongoose.Model<mongoose.Document<KPI, any, any>, any, any>, undefined, {}>;

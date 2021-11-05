@@ -15,47 +15,51 @@ const mongoose = require("mongoose");
 let SheetTEMP = class SheetTEMP {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], SheetTEMP.prototype, "name", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], SheetTEMP.prototype, "totalBudget", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], SheetTEMP.prototype, "overallStatus", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], SheetTEMP.prototype, "progress", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], SheetTEMP.prototype, "kpiPlans", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], SheetTEMP.prototype, "kpiDates", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], SheetTEMP.prototype, "statusDate", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], SheetTEMP.prototype, "budgetDate", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], SheetTEMP.prototype, "kpiProgress", void 0);
 __decorate([
-    mongoose_1.Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'MeasureTEMP' }),
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Array)
+], SheetTEMP.prototype, "monthNames", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose.Schema.Types.ObjectId, ref: 'MeasureTEMP' }),
     __metadata("design:type", Array)
 ], SheetTEMP.prototype, "measures", void 0);
 SheetTEMP = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], SheetTEMP);
 exports.SheetTEMP = SheetTEMP;
 exports.SheetTEMPSchema = mongoose_1.SchemaFactory.createForClass(SheetTEMP);

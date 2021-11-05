@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Sheet, SheetSchema } from '../schemas/sheet.schema';
-import { Measure, MeasureSchema } from '../schemas/measure.schema';
-import { Artefact, ArtefactSchema } from '../schemas/artefact.schema';
-import { Budget, BudgetSchema } from '../schemas/budget.schema';
-import { Notification, NotificationSchema } from '../schemas/notification.schema';
-import { NotificationStatus, NotificationStatusSchema } from '../schemas/notificationStatus.schema';
+import { Sheet } from '../schemas/sheet.schema';
+import { Measure } from '../schemas/measure.schema';
+import { Artefact } from '../schemas/artefact.schema';
+import { Budget } from '../schemas/budget.schema';
+import { Notification } from '../schemas/notification.schema';
+import { NotificationStatus } from '../schemas/notificationStatus.schema';
 import { Model } from 'mongoose';
-import { fileNames, rootPath } from 'src/globalVars';
 import '../types';
-import { Overview, PastBudget } from '../types';
+import { PastBudget } from '../types';
 import { Upload } from 'src/schemas/upload.schema';
-const fs = require('fs');
-
+import { dateTimeNow, rootPath } from '../globalVars';
 
 @Injectable()
 export class ApiService {
@@ -23,16 +21,17 @@ export class ApiService {
     @InjectModel('Budget') private budgetModel: Model<Budget>,
     @InjectModel('PastBudget') private pastBudgetModel: Model<PastBudget>,
     @InjectModel('Notification') private notificationModel: Model<Notification>,
-    @InjectModel('NotificationStatus') private notificationStatusModel: Model<NotificationStatus>,
+    @InjectModel('NotificationStatus')
+    private notificationStatusModel: Model<NotificationStatus>,
     @InjectModel('Upload') private uploadModel: Model<Upload>,
-  ) { }
+  ) {}
 
   async getMeasure(measureID: string): Promise<Measure> {
     try {
       const measure = await this.measureModel.findById(measureID);
       return measure;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -46,42 +45,36 @@ export class ApiService {
         .execPopulate();
       return populatedMeasure.artefacts;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
   async getMeasureID(measureTitle: string): Promise<string> {
-    console.log("_________________getMeasureID______________")
-    console.log(measureTitle)
     try {
       const measure = await this.measureModel.findOne({
         title: measureTitle,
       });
-      return measure._id
+      return measure._id;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
-
-
-
 
   async getAllMeasures(): Promise<Measure[]> {
     try {
       const result = await this.measureModel.find().sort({ id: 'asc' });
       return result;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
   async getOverview(): Promise<Sheet> {
     try {
       const excelSheet = await this.sheetModel.findOne();
-      console.log(excelSheet)
       return excelSheet;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -90,215 +83,160 @@ export class ApiService {
       const budget = await this.budgetModel.findOne();
       return budget;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
   async getPastBudgets(): Promise<PastBudget[]> {
     try {
       const result = await this.pastBudgetModel.find();
-      console.log(result)
       return result;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
-
-
-
-  async lookAtNotifications(): Promise<Notification[]> {
+  async setAllNotificationsToSeen(): Promise<Notification[]> {
     try {
       const allNots = await this.notificationModel.find();
       if (allNots) {
-        allNots.forEach(async n => {
+        allNots.forEach(async (n) => {
           await n.update({
-            seen: true
-          })
-        })
+            seen: true,
+          });
+        });
       }
       return allNots;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
-  async getNotifications(all): Promise<Notification[]> {
+  async getNotifications(all: boolean): Promise<Notification[]> {
     try {
-      let result
-      if (all) {
-        console.log("all notifications")
-        //     console.log(all)
-        result = await this.notificationModel.find();
-      } else {
-        result = await this.notificationModel.find({
-          notified: false
+      const result: Notification[] = all
+        ? await this.notificationModel.find()
+        : await this.notificationModel.find({
+            notified: false,
+          });
+      if (all && result.length > 0) {
+        result.forEach(async (n) => {
+          await n.update({ notified: true });
         });
-        if (result) {
-          for (let i = 0; i > result.length; i++) {
-            const updated = await result[i].update({ notified: true })
-          }
-        }
       }
-      //    console.log(result)
       return result;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
-  async setToNotified(result) {
+  async setToNotified(result: Notification[]): Promise<void> {
     if (result) {
       for (let i = 0; i < result.length; i++) {
-        const updated = await result[i].update({ notified: true })
+        await result[i].update({ notified: true });
       }
     }
   }
 
-
-
-  async setNotification(notification): Promise<Notification> {
-    try {
-      console.log("save new NOTIFICATION")
-      console.log(notification)
-      const newNot = new this.notificationModel(notification);
-      await newNot.save()
-      return newNot
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async checkNotifications(): Promise<NotificationStatus> {
-    try {
-      const change = await this.notificationStatusModel.findOne({
-        change: true,
-      });
-      if (change) {
-        console.log("found notification")
-        await change.update({
-          change: false
-        })
-        return change
-      } else {
-        console.log("no notification")
-        const newChange = new this.notificationStatusModel({
-          change: false
-        });
-        return newChange
-      }
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async filesChanged(): Promise<NotificationStatus[]> {
-    console.log("something hapening")
+  async checkForNewNotifications(): Promise<NotificationStatus> | undefined {
+    // route of this function is periodically visited by the frontend to check if change has happened,
+    // i.e. that new notifications are availible. Database property/variable 'change' indicates this and is toggled back to false after the visit.
     try {
       const existingChange = await this.notificationStatusModel.findOne();
       if (existingChange) {
-        await existingChange.update({
-          change: true
-        });
+        if (existingChange.change) {
+          await existingChange.update({
+            change: false,
+          });
+        }
+        return existingChange;
       } else {
+        // table is empty. Create entry
         const newChange = new this.notificationStatusModel({
-          change: true
+          change: false,
         });
-        await newChange.save()
+        await newChange.save();
+        return newChange;
       }
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
-
-  async HandleFileUpload(originalname, targetFileName): Promise<boolean> {
-    fs.rename(rootPath + '/files/' + originalname, rootPath + '/data/' + targetFileName, function (err) {
-      if (err) console.log('ERROR: ' + err);
-    });
-    return true
+  async handleFileUpload(
+    originalname: string,
+    targetFileName: string,
+  ): Promise<boolean> {
+    const fs = require('fs');
+    try {
+      await fs.promises.rename(
+        rootPath + '/files/' + originalname,
+        rootPath + '/data/' + targetFileName,
+      );
+      return true;
+    } catch (err) {
+      console.error('Error occured while reading directory!', err);
+      return false;
+    }
   }
 
-
-  async createNotificationForFileChange(fileCategory): Promise<boolean> {
-    let fileName = ""
+  async createNotificationForFileChange(fileCategory: string): Promise<void> {
+    let fileName = '';
     switch (parseInt(fileCategory)) {
       case 1:
-        fileName = "Budget Report"
+        fileName = 'Budget Report';
         break;
       case 2:
-        fileName = "KPI Report"
+        fileName = 'KPI Report';
         break;
       case 3:
-        fileName = "Status Report"
+        fileName = 'Status Report';
         break;
       case 4:
-        fileName = "Measure Overview"
+        fileName = 'Measure Overview';
         break;
       case 5:
-        fileName = "All Budgets"
+        fileName = 'All Budgets';
         break;
       default:
-        fileName = ""
+        fileName = '';
         break;
     }
     const notification = {
-      title: "File Upload",
-      body: "A new " + fileName + " file has been uploaded",
-      time: this.datetimNow(),
-      type: "file",
-      measure: "",
+      title: 'File Upload',
+      body: 'A new ' + fileName + ' file has been uploaded',
+      time: dateTimeNow(),
+      type: 'file',
+      measure: '',
       seen: false,
-      notified: false
-    }
+      notified: false,
+    };
     const newNot = new this.notificationModel(notification);
-    await newNot.save()
+    await newNot.save();
     const upload = await this.uploadModel.findOne({
-      name: fileName
-    })
+      name: fileName,
+    });
     if (upload) {
       await upload.update({
         date: new Date().toISOString().split('T')[0],
-        ok: true
+        ok: true,
       });
     } else {
       const newUpload = new this.uploadModel({
         name: fileName,
         date: new Date().toISOString().split('T')[0],
-        ok: true
+        ok: true,
       });
-      await newUpload.save()
+      await newUpload.save();
     }
-    return true
   }
 
-
-
-  async getUploadInfo(): Promise<Upload[]> {
+  async filesInParseBuffer(): Promise<Upload[]> {
     try {
-      const uploadInfo = await this.uploadModel.find();
-      return uploadInfo
+      const files = await this.uploadModel.find();
+      return files;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
-
-
-  datetimNow() {
-    const currentdate = new Date();
-    return currentdate.getDate() + "."
-      + (currentdate.getMonth() + 1) + "."
-      + currentdate.getFullYear() + " "
-      + currentdate.getHours() + ":"
-      + currentdate.getMinutes()
-  }
-
-
-
-
 }
-
-
-
-
-

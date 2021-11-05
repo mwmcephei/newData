@@ -14,39 +14,39 @@ const mongoose_1 = require("@nestjs/mongoose");
 let KPI = class KPI {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], KPI.prototype, "title", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "target", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "actuals", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "baseline", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "plan1", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "plan2", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "plan3", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], KPI.prototype, "plan4", void 0);
 KPI = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], KPI);
 exports.KPI = KPI;
 exports.KPISchema = mongoose_1.SchemaFactory.createForClass(KPI);

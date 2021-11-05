@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { XlsxParserService } from './xlsx-parser.service';
-import { XlsxParserController } from './xlsx-parser.controller';
+import { XlsxParserService } from './xlsxParser.service';
+import { XlsxParserController } from './xlsxParser.controller';
 import { SheetSchema } from '../schemas/sheet.schema';
 import { SheetTEMPSchema } from '../schemas/sheetTEMP.schema';
 import { MeasureSchema } from '../schemas/measure.schema';
@@ -14,7 +14,6 @@ import { BudgetTEMPSchema } from '../schemas/budgetTEMP.schema';
 import { NotificationSchema } from 'src/schemas/notification.schema';
 import { NotificationStatusSchema } from 'src/schemas/notificationStatus.schema';
 import { UploadSchema } from 'src/schemas/upload.schema';
-
 
 @Module({
   imports: [
@@ -36,4 +35,4 @@ import { UploadSchema } from 'src/schemas/upload.schema';
   providers: [XlsxParserController, XlsxParserService],
   controllers: [XlsxParserController],
 })
-export class XlsxParserModule { }
+export class XlsxParserModule {}

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { XlsxParserController } from './xlsx-parser.controller';
+import { XlsxParserController } from './xlsxParser.controller';
+import { XlsxParserService } from './xlsxParser.service';
 
 describe('XlsxParserController', () => {
   let controller: XlsxParserController;
@@ -7,6 +8,7 @@ describe('XlsxParserController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [XlsxParserController],
+      providers: [{ provide: XlsxParserService, useValue: {} }],
     }).compile();
 
     controller = module.get<XlsxParserController>(XlsxParserController);

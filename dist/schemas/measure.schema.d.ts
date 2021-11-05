@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import { Artefact } from './artefact.schema';
 import { KPI } from './kpi.schema';
 import { BudgetDetail } from './budgetDetail.schema';
+import { Risk } from 'src/types';
 export declare type MeasureDocument = Measure & mongoose.Document;
 export declare class Measure {
     title: string;
@@ -27,17 +28,9 @@ export declare class Measure {
     artefact: number;
     kpiProgress: number;
     monthlySpendings: number[];
-    risks: [
-        {
-            risk: string;
-            description: string;
-            criticality: string;
-            migration: string;
-            resolutionDate: string | number;
-        }
-    ];
+    risks: Risk[];
     budgetDetail: BudgetDetail;
     kpiData: KPI;
     artefacts: [Artefact];
 }
-export declare const MeasureSchema: mongoose.Schema<mongoose.Document<Measure, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const MeasureSchema: mongoose.Schema<mongoose.Document<Measure, any, any>, mongoose.Model<mongoose.Document<Measure, any, any>, any, any>, undefined, {}>;

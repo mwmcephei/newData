@@ -15,47 +15,51 @@ const mongoose = require("mongoose");
 let Sheet = class Sheet {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Sheet.prototype, "name", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Sheet.prototype, "totalBudget", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Sheet.prototype, "overallStatus", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Sheet.prototype, "progress", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Array)
+], Sheet.prototype, "monthNames", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Sheet.prototype, "kpiPlans", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Array)
 ], Sheet.prototype, "kpiDates", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Sheet.prototype, "statusDate", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Sheet.prototype, "budgetDate", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Sheet.prototype, "kpiProgress", void 0);
 __decorate([
-    mongoose_1.Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Measure' }),
+    (0, mongoose_1.Prop)({ type: mongoose.Schema.Types.ObjectId, ref: 'Measure' }),
     __metadata("design:type", Array)
 ], Sheet.prototype, "measures", void 0);
 Sheet = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], Sheet);
 exports.Sheet = Sheet;
 exports.SheetSchema = mongoose_1.SchemaFactory.createForClass(Sheet);

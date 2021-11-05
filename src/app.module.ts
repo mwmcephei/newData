@@ -1,26 +1,27 @@
 import { Module } from '@nestjs/common';
-import { XlsxParserModule } from './xlsx-parser/xlsx-parser.module';
+import { XlsxParserModule } from './xlsxParser/xlsxParser.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApiModule } from './api/api.module';
-import { SimpleauthModule } from './simpleauth/simpleauth.module';
+import { SimpleAuthModule } from './simpleAuth/simpleAuth.module';
 import { MulterModule } from '@nestjs/platform-express';
-
-
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [MulterModule.register({
-    dest: './uploads',
-  }),
-
-  MongooseModule.forRoot(
-    //    'mongodb+srv://mwm:matthias88@cluster0.f8xt0.mongodb.net/testDataDB?retryWrites=true&w=majority',
-    // 'mongodb+srv://mwm:mwm@cluster0.drn93.mongodb.net/myFirstDatabase?retryWrites=true&w=majority' 
-    'mongodb+srv://pmo:pmo@cluster0.af8k1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    //  'mongodb://mongo:27017/pmo-nest-mongo'  // Docker
-  ),
+  imports: [
+    MulterModule.register({
+      dest: './uploads',
+    }),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(
+      //     process.env.MONGODB_CONNECTION_DEV_1,
+      //       process.env.MONGODB_CONNECTION_DEV_2,
+      process.env.MONGODB_CONNECTION_DEV_3,
+      // process.env.MONGODB_CONNECTION_DOCKER
+      //  'mongodb://mongo:27017/pmo-nest-mongo'  // Docker
+    ),
     XlsxParserModule,
     ApiModule,
-    SimpleauthModule
+    SimpleAuthModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

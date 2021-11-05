@@ -31,6 +31,9 @@ export class SheetTEMP {
   @Prop()
   kpiProgress: number;
 
+  @Prop()
+  monthNames: string[];
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'MeasureTEMP' })
   measures: [MeasureTEMP];
 }

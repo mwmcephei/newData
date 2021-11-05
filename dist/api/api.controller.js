@@ -12,17 +12,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listDir = exports.mapFileNames = exports.xlsxFileFilter = exports.ApiController = exports.SetNotificationDto = exports.UploadDto = void 0;
+exports.listDir = exports.mapFileCategoryToFilename = exports.xlsxFileFilter = exports.ApiController = exports.SetNotificationDto = void 0;
 const common_1 = require("@nestjs/common");
 const api_service_1 = require("./api.service");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const globalVars_1 = require("../globalVars");
-const fs = require('fs');
-const util = require('util');
-class UploadDto {
-}
-exports.UploadDto = UploadDto;
 class SetNotificationDto {
 }
 exports.SetNotificationDto = SetNotificationDto;
@@ -38,9 +33,6 @@ let ApiController = class ApiController {
     }
     async getMeasureID(params) {
         const measureID = await this.apiService.getMeasureID(params.measureTitle);
-        console.log("measureID");
-        console.log(params.measureTitle);
-        console.log(measureID);
         return measureID;
     }
     getOverview() {
@@ -56,142 +48,126 @@ let ApiController = class ApiController {
         return this.apiService.getPastBudgets();
     }
     async getNotifications(params) {
-        const allAsBool = (params.all === 'true');
+        const allAsBool = params.all === 'true';
         const result = await this.apiService.getNotifications(allAsBool);
         if (result) {
             await this.apiService.setToNotified(result);
         }
         return result;
     }
-    lookAtNotifications() {
-        return this.apiService.lookAtNotifications();
+    setAllNotificationsToSeen() {
+        return this.apiService.setAllNotificationsToSeen();
     }
-    async setNotification(notification) {
-        console.log(notification);
-        return this.apiService.setNotification(notification);
+    checkForNewNotifications() {
+        return this.apiService.checkForNewNotifications();
     }
-    checkNotifications() {
-        return this.apiService.checkNotifications();
-    }
-    async getUploadInfo() {
-        const filesInBuffer = await this.apiService.getUploadInfo();
-        const filesAlreadyParsed = await exports.listDir(globalVars_1.rootPath + '/src/realData/');
+    async existingFiles() {
+        const filesInBuffer = await this.apiService.filesInParseBuffer();
+        const filesAlreadyParsed = await (0, exports.listDir)(globalVars_1.rootPath + '/src/realData/');
         return {
             filesInBuffer,
-            filesAlreadyParsed
+            filesAlreadyParsed,
         };
     }
-    async uploadedFile(category, file) {
-        console.log("file");
-        console.log(file);
-        console.log(category.name);
+    async upload(category, file) {
         await this.apiService.createNotificationForFileChange(category.name);
-        const targetFileName = exports.mapFileNames(category.name);
-        console.log(targetFileName);
+        const targetFileName = (0, exports.mapFileCategoryToFilename)(category.name);
         const response = {
             originalname: file.originalname,
             filename: file.filename,
         };
-        return this.apiService.HandleFileUpload(file.originalname, targetFileName);
+        return this.apiService.handleFileUpload(file.originalname, targetFileName);
     }
 };
 __decorate([
-    common_1.Get('measure/:measureID'),
-    __param(0, common_1.Param()),
+    (0, common_1.Get)('measure/:measureID'),
+    __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ApiController.prototype, "getMeasure", null);
 __decorate([
-    common_1.Get('measure/:measureID/artefacts'),
-    __param(0, common_1.Param()),
+    (0, common_1.Get)('measure/:measureID/artefacts'),
+    __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ApiController.prototype, "getArtefactsOfMeasure", null);
 __decorate([
-    common_1.Get('getMeasureID/:measureTitle'),
-    __param(0, common_1.Param()),
+    (0, common_1.Get)('measure/id/:measureTitle'),
+    __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ApiController.prototype, "getMeasureID", null);
 __decorate([
-    common_1.Get('overview'),
+    (0, common_1.Get)('overview'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ApiController.prototype, "getOverview", null);
 __decorate([
-    common_1.Get('measures'),
+    (0, common_1.Get)('measures'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ApiController.prototype, "getAllMeasures", null);
 __decorate([
-    common_1.Get('budget'),
+    (0, common_1.Get)('budget'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ApiController.prototype, "getBudget", null);
 __decorate([
-    common_1.Get('pastBudget'),
+    (0, common_1.Get)('pastBudget'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ApiController.prototype, "getPastBudgets", null);
 __decorate([
-    common_1.Get("getNotifications/:all"),
-    __param(0, common_1.Param()),
+    (0, common_1.Get)('getNotifications/:all'),
+    __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ApiController.prototype, "getNotifications", null);
 __decorate([
-    common_1.Get("lookAtNotifications"),
+    (0, common_1.Get)('setAllNotificationsToSeen'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], ApiController.prototype, "lookAtNotifications", null);
+], ApiController.prototype, "setAllNotificationsToSeen", null);
 __decorate([
-    common_1.Post("setNotification"),
-    __param(0, common_1.Body()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [SetNotificationDto]),
-    __metadata("design:returntype", Promise)
-], ApiController.prototype, "setNotification", null);
-__decorate([
-    common_1.Get('checkNotifications'),
+    (0, common_1.Get)('checkForNewNotifications'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], ApiController.prototype, "checkNotifications", null);
+], ApiController.prototype, "checkForNewNotifications", null);
 __decorate([
-    common_1.Get('uploadInfo'),
+    (0, common_1.Get)('existingFiles'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], ApiController.prototype, "getUploadInfo", null);
+], ApiController.prototype, "existingFiles", null);
 __decorate([
-    common_1.Post('upload'),
-    common_1.UseInterceptors(platform_express_1.FileInterceptor('file', {
-        storage: multer_1.diskStorage({
+    (0, common_1.Post)('upload'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
             destination: './files',
             filename: function (req, file, callback) {
-                console.log(req.body);
                 callback(null, file.originalname);
             },
         }),
         fileFilter: exports.xlsxFileFilter,
     })),
-    __param(0, common_1.Body()),
-    __param(1, common_1.UploadedFile()),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], ApiController.prototype, "uploadedFile", null);
+], ApiController.prototype, "upload", null);
 ApiController = __decorate([
-    common_1.Controller('api'),
+    (0, common_1.Controller)('api'),
     __metadata("design:paramtypes", [api_service_1.ApiService])
 ], ApiController);
 exports.ApiController = ApiController;
@@ -202,30 +178,25 @@ const xlsxFileFilter = (req, file, callback) => {
     callback(null, true);
 };
 exports.xlsxFileFilter = xlsxFileFilter;
-const mapFileNames = (fileName) => {
+const mapFileCategoryToFilename = (fileName) => {
     switch (parseInt(fileName)) {
         case 1:
-            return "budget_report.xlsx";
-            break;
+            return globalVars_1.fileNamesWithoutExtension[0] + '.xlsx';
         case 2:
-            return "KPI-report_1.xlsx";
-            break;
+            return globalVars_1.fileNamesWithoutExtension[1] + '.xlsx';
         case 3:
-            return "status_report.xlsx";
-            break;
+            return globalVars_1.fileNamesWithoutExtension[2] + '.xlsx';
         case 4:
-            return "test_data.xlsx";
-            break;
+            return globalVars_1.fileNamesWithoutExtension[3] + '.xlsx';
         case 5:
-            return "budget_past.xlsx";
-            break;
+            return globalVars_1.fileNamesWithoutExtension[4] + '.xlsx';
         default:
-            return "none";
-            break;
+            return 'none';
     }
 };
-exports.mapFileNames = mapFileNames;
+exports.mapFileCategoryToFilename = mapFileCategoryToFilename;
 const listDir = async (path) => {
+    const fs = require('fs');
     const fsPromises = fs.promises;
     try {
         return fsPromises.readdir(path);

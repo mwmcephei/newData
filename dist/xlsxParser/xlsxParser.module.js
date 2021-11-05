@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.XlsxParserModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const xlsx_parser_service_1 = require("./xlsx-parser.service");
-const xlsx_parser_controller_1 = require("./xlsx-parser.controller");
+const xlsxParser_service_1 = require("./xlsxParser.service");
+const xlsxParser_controller_1 = require("./xlsxParser.controller");
 const sheet_schema_1 = require("../schemas/sheet.schema");
 const sheetTEMP_schema_1 = require("../schemas/sheetTEMP.schema");
 const measure_schema_1 = require("../schemas/measure.schema");
@@ -26,7 +26,7 @@ const upload_schema_1 = require("../schemas/upload.schema");
 let XlsxParserModule = class XlsxParserModule {
 };
 XlsxParserModule = __decorate([
-    common_1.Module({
+    (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: 'Sheet', schema: sheet_schema_1.SheetSchema },
@@ -43,9 +43,9 @@ XlsxParserModule = __decorate([
                 { name: 'Upload', schema: upload_schema_1.UploadSchema },
             ]),
         ],
-        providers: [xlsx_parser_controller_1.XlsxParserController, xlsx_parser_service_1.XlsxParserService],
-        controllers: [xlsx_parser_controller_1.XlsxParserController],
+        providers: [xlsxParser_controller_1.XlsxParserController, xlsxParser_service_1.XlsxParserService],
+        controllers: [xlsxParser_controller_1.XlsxParserController],
     })
 ], XlsxParserModule);
 exports.XlsxParserModule = XlsxParserModule;
-//# sourceMappingURL=xlsx-parser.module.js.map
+//# sourceMappingURL=xlsxParser.module.js.map

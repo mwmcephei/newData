@@ -3,6 +3,7 @@ import * as mongoose from 'mongoose';
 import { Artefact } from './artefact.schema';
 import { KPI } from './kpi.schema';
 import { BudgetDetail } from './budgetDetail.schema';
+import { Risk } from 'src/types';
 
 export type MeasureDocument = Measure & mongoose.Document;
 
@@ -63,15 +64,7 @@ export class Measure {
   monthlySpendings: number[];
 
   @Prop()
-  risks: [
-    {
-      risk: string;
-      description: string;
-      criticality: string;
-      migration: string;
-      resolutionDate: string | number;
-    },
-  ];
+  risks: Risk[];
 
   @Prop()
   budgetDetail: BudgetDetail;

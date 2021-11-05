@@ -7,4 +7,4 @@ export declare class PastBudget {
     category: string;
     year: number;
 }
-export declare const PastBudgetSchema: import("mongoose").Schema<Document<PastBudget, any, any>, import("mongoose").Model<any, any, any>, undefined, any>;
+export declare const PastBudgetSchema: import("mongoose").Schema<Document<PastBudget, any, any>, import("mongoose").Model<Document<PastBudget, any, any>, any, any>, undefined, {}>;

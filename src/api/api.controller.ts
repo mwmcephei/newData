@@ -1,149 +1,129 @@
-import { Controller, Get, Post, Param, Body, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiService } from './api.service';
-import { Express } from 'express'
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { Notification } from '../schemas/notification.schema';
-import { NotificationStatus } from '../schemas/notificationStatus.schema';
-import { rootPath } from 'src/globalVars';
-const fs = require('fs');
-const util = require('util');
-
-
-export class UploadDto {
-  filename: string;
-  file: object;
-}
+import { fileNamesWithoutExtension, rootPath } from '../globalVars';
+import { ExistingFiles } from '../types';
 
 export class SetNotificationDto {
   title: string;
   body: string;
-  seen: boolean
+  seen: boolean;
 }
-
 
 @Controller('api')
 export class ApiController {
-  constructor(private readonly apiService: ApiService) { }
+  constructor(private readonly apiService: ApiService) {}
 
-
+  // returns measure wth a certain ID
   @Get('measure/:measureID')
   getMeasure(@Param() params) {
     return this.apiService.getMeasure(params.measureID);
   }
 
+  // returns the artefacts of a measure wth a certain ID
   @Get('measure/:measureID/artefacts')
   getArtefactsOfMeasure(@Param() params) {
     return this.apiService.getArtefactsOfMeasure(params.measureID);
   }
 
-  @Get('getMeasureID/:measureTitle')
+  // returns the database id of a measure with a certain title (e.g. "M274")
+  @Get('measure/id/:measureTitle')
   async getMeasureID(@Param() params) {
     const measureID = await this.apiService.getMeasureID(params.measureTitle);
-    console.log("measureID")
-    console.log(params.measureTitle)
-    console.log(measureID)
-    return measureID
-
+    return measureID;
   }
 
+  // returns the "Sheet" table containing information concerning all measures
   @Get('overview')
   getOverview() {
     return this.apiService.getOverview();
   }
 
+  // returns a list of all entries from the measures table
   @Get('measures')
   getAllMeasures() {
     return this.apiService.getAllMeasures();
   }
 
+  // returns the "Budget" table containing information concerning all measures
   @Get('budget')
   getBudget() {
     return this.apiService.getBudget();
   }
 
+  // returns the "PastBudgets" table containing information concerning old measures
   @Get('pastBudget')
   getPastBudgets() {
     return this.apiService.getPastBudgets();
   }
 
-  @Get("getNotifications/:all")
+  // returns notifications from database
+  // param 'all' determines whether all notifications or only those where notified === false
+  @Get('getNotifications/:all')
   async getNotifications(@Param() params) {
-    const allAsBool = (params.all === 'true')
+    const allAsBool = params.all === 'true';
     const result = await this.apiService.getNotifications(allAsBool);
     if (result) {
       await this.apiService.setToNotified(result);
     }
-    return result
+    return result;
   }
 
-  @Get("lookAtNotifications")
-  lookAtNotifications() {
-    return this.apiService.lookAtNotifications();
+  // set property "seen" to true for all unseen notifications
+  @Get('setAllNotificationsToSeen')
+  setAllNotificationsToSeen() {
+    return this.apiService.setAllNotificationsToSeen();
   }
 
-  @Post("setNotification")
-  async setNotification(@Body() notification: SetNotificationDto) {
-    console.log(notification)
-    return this.apiService.setNotification(notification);
+  // currently not in use
+  @Get('checkForNewNotifications')
+  checkForNewNotifications() {
+    return this.apiService.checkForNewNotifications();
   }
 
-  @Get('checkNotifications')
-  checkNotifications() {
-    return this.apiService.checkNotifications();
-  }
-
-  @Get('uploadInfo')
-  async getUploadInfo() {
-    const filesInBuffer = await this.apiService.getUploadInfo();
-    const filesAlreadyParsed = await listDir(rootPath + '/src/realData/')
+  // returns names of files currently in the parse buffer (/data) and currently parsed data (/src/realData)
+  @Get('existingFiles')
+  async existingFiles(): Promise<ExistingFiles> {
+    const filesInBuffer = await this.apiService.filesInParseBuffer();
+    const filesAlreadyParsed = await listDir(rootPath + '/src/realData/');
     return {
       filesInBuffer,
-      filesAlreadyParsed
-    }
+      filesAlreadyParsed,
+    };
   }
 
-
-
-
-
-
-
-
-
-
+  // uploads file into the parse buffer
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './files',
         filename: function (req, file, callback) {
-          console.log(req.body);
-          callback(null, file.originalname)
+          callback(null, file.originalname);
         },
       }),
       fileFilter: xlsxFileFilter,
     }),
   )
-  async uploadedFile(@Body() category, @UploadedFile() file) {
-    console.log("file")
-    console.log(file)
-    console.log(category.name)
-    await this.apiService.createNotificationForFileChange(category.name)
-    const targetFileName = mapFileNames(category.name)
-    console.log(targetFileName)
-
+  async upload(@Body() category, @UploadedFile() file) {
+    await this.apiService.createNotificationForFileChange(category.name);
+    const targetFileName = mapFileCategoryToFilename(category.name);
     const response = {
       originalname: file.originalname,
       filename: file.filename,
     };
-    return this.apiService.HandleFileUpload(file.originalname, targetFileName);
+    return this.apiService.handleFileUpload(file.originalname, targetFileName);
   }
-
-
 }
-
 
 export const xlsxFileFilter = (req, file, callback) => {
   if (!file.originalname.match(/\.(xlsx)$/)) {
@@ -152,34 +132,29 @@ export const xlsxFileFilter = (req, file, callback) => {
   callback(null, true);
 };
 
-export const mapFileNames = (fileName) => {
+export const mapFileCategoryToFilename = (fileName: string): string => {
   switch (parseInt(fileName)) {
     case 1:
-      return "budget_report.xlsx"
-      break;
+      return fileNamesWithoutExtension[0] + '.xlsx';
     case 2:
-      return "KPI-report_1.xlsx"
-      break;
+      return fileNamesWithoutExtension[1] + '.xlsx';
     case 3:
-      return "status_report.xlsx"
-      break;
+      return fileNamesWithoutExtension[2] + '.xlsx';
     case 4:
-      return "test_data.xlsx"
-      break;
+      return fileNamesWithoutExtension[3] + '.xlsx';
     case 5:
-      return "budget_past.xlsx"
-      break;
+      return fileNamesWithoutExtension[4] + '.xlsx';
     default:
-      return "none"
-      break;
+      return 'none';
   }
 };
 
-export const listDir = async (path) => {
+export const listDir = async (path): Promise<string[] | undefined> => {
+  const fs = require('fs');
   const fsPromises = fs.promises;
   try {
     return fsPromises.readdir(path);
   } catch (err) {
     console.error('Error occured while reading directory!', err);
   }
-}
+};

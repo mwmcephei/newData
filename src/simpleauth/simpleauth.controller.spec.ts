@@ -1,15 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SimpleauthController } from './simpleauth.controller';
+import { SimpleAuthController } from './simpleauth.controller';
+import { SimpleAuthService } from './simpleAuth.service';
 
 describe('SimpleauthController', () => {
-  let controller: SimpleauthController;
+  let controller: SimpleAuthController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [SimpleauthController],
+      controllers: [SimpleAuthController],
+      providers: [{ provide: SimpleAuthService, useValue: {} }],
     }).compile();
 
-    controller = module.get<SimpleauthController>(SimpleauthController);
+    controller = module.get<SimpleAuthController>(SimpleAuthController);
   });
 
   it('should be defined', () => {

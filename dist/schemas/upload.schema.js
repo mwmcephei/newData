@@ -14,19 +14,19 @@ const mongoose_1 = require("@nestjs/mongoose");
 let Upload = class Upload {
 };
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Upload.prototype, "name", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Upload.prototype, "date", void 0);
 __decorate([
-    mongoose_1.Prop(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Boolean)
 ], Upload.prototype, "ok", void 0);
 Upload = __decorate([
-    mongoose_1.Schema()
+    (0, mongoose_1.Schema)()
 ], Upload);
 exports.Upload = Upload;
 exports.UploadSchema = mongoose_1.SchemaFactory.createForClass(Upload);

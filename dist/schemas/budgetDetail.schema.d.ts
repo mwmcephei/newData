@@ -7,4 +7,4 @@ export declare class BudgetDetail {
     forecastBudge: number;
     contractBudget: number;
 }
-export declare const BudgetDetailSchema: mongoose.Schema<mongoose.Document<BudgetDetail, any, any>, mongoose.Model<any, any, any>, undefined, any>;
+export declare const BudgetDetailSchema: mongoose.Schema<mongoose.Document<BudgetDetail, any, any>, mongoose.Model<mongoose.Document<BudgetDetail, any, any>, any, any>, undefined, {}>;

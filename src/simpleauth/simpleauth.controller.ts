@@ -1,34 +1,28 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { SimpleauthService } from './simpleauth.service';
-
+import { SimpleAuthService } from './simpleAuth.service';
 
 export class UserDataDto {
-    username: string;
-    password: string;
+  username: string;
+  password: string;
 }
 
+@Controller('simpleAuth')
+export class SimpleAuthController {
+  constructor(private SimpleAuthService: SimpleAuthService) {}
 
+  @Post('login')
+  async login(@Body() userData: UserDataDto) {
+    const success = await this.SimpleAuthService.login(
+      userData.username,
+      userData.password,
+    );
+    return {
+      login: success,
+    };
+  }
 
-@Controller('simpleauth')
-export class SimpleauthController {
-    constructor(private simpleauthService: SimpleauthService) { }
-
-
-
-    @Post("login")
-    async login(@Body() userData: UserDataDto) {
-        const success = await this.simpleauthService.login(userData.username, userData.password)
-        console.log(success)
-        return {
-            login: success
-        }
-    }
-
-
-    @Get('adduser')
-    parse() {
-        return this.simpleauthService.addUser();
-    }
-
-
+  @Get('adduser')
+  addUser() {
+    return this.SimpleAuthService.addUser();
+  }
 }

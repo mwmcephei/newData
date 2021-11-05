@@ -12,41 +12,43 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SimpleauthService = void 0;
+exports.SimpleAuthService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-let SimpleauthService = class SimpleauthService {
+let SimpleAuthService = class SimpleAuthService {
     constructor(userModel) {
         this.userModel = userModel;
     }
     async login(username, password) {
-        const user = await this.userModel.findOne({ username: username, password: password });
+        const user = await this.userModel.findOne({
+            username: username,
+            password: password,
+        });
         if (user) {
-            console.log(user);
             return true;
         }
         else {
-            console.log("no user");
             return false;
         }
     }
-    addUser() {
+    async addUser() {
         const newUser = new this.userModel({
-            username: "test",
-            password: "pmo"
+            username: 'test',
+            password: 'pmo',
         });
-        newUser.save().then(res => {
-            console.log(res);
-        }).catch(e => {
-            console.log(e);
-        });
+        try {
+            await newUser.save();
+        }
+        catch (error) {
+            throw error;
+        }
     }
 };
-SimpleauthService = __decorate([
-    common_1.Injectable(),
-    __param(0, mongoose_1.InjectModel('User')),
+SimpleAuthService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, mongoose_1.InjectModel)('User')),
     __metadata("design:paramtypes", [mongoose_2.Model])
-], SimpleauthService);
-exports.SimpleauthService = SimpleauthService;
-//# sourceMappingURL=simpleauth.service.js.map
+], SimpleAuthService);
+exports.SimpleAuthService = SimpleAuthService;
+//# sourceMappingURL=simpleAuth.service.js.map
