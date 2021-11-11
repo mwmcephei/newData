@@ -25,6 +25,22 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
+], Sheet.prototype, "totalSpentBudget", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Sheet.prototype, "totalInvoicedBudget", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Sheet.prototype, "totalPlanBudget", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Sheet.prototype, "totalForecastBudget", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
 ], Sheet.prototype, "overallStatus", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),

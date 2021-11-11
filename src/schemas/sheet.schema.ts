@@ -12,10 +12,17 @@ export class Sheet {
 
   @Prop()
   totalBudget: number;
+  @Prop()
+  totalSpentBudget: number;
+  @Prop()
+  totalInvoicedBudget: number;
+  @Prop()
+  totalPlanBudget: number;
+  @Prop()
+  totalForecastBudget: number;
 
   @Prop()
   overallStatus: number;
-
   @Prop()
   progress: number;
 

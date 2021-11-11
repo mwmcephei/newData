@@ -17,7 +17,7 @@ export const fileNames = {
   xlsx_file_dir,
   main_file: 'realData/' + fileNamesWithoutExtension[3] + '.xlsx', // = Status Report Demo.xlsx
   kpi_file_1: 'realData/' + fileNamesWithoutExtension[1] + '.xlsx',
-  budget_file: 'realData/' + fileNamesWithoutExtension[0] + '.xlsx',
+  budgetFile: 'realData/' + fileNamesWithoutExtension[0] + '.xlsx',
   status_report: 'realData/' + fileNamesWithoutExtension[2] + '.xlsx', // = overview
   budget_past: 'realData/' + fileNamesWithoutExtension[4] + '.xlsx',
 };

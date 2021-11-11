@@ -13,8 +13,7 @@ import { BudgetTEMP } from '../schemas/budgetTEMP.schema';
 import { Model } from 'mongoose';
 import { resolve } from 'path';
 import * as XLSX from 'xlsx';
-import { fileNames, rootPath } from '../globalVars';
-import '../types';
+import { dateTimeNow, fileNames, rootPath } from '../globalVars';
 import '../types';
 import {
   AllBudgetMeasures,
@@ -26,9 +25,9 @@ import {
   PastBudget,
   Risk,
   SheetType,
+  TotalApprovedAndSpentBudget,
 } from '../types';
 import { Upload } from '../schemas/upload.schema';
-import { dateTimeNow } from '../globalVars';
 
 const fs = require('fs');
 
@@ -344,15 +343,15 @@ export class XlsxParserService {
     const status_report = concernsOnlyNewData
       ? rootPath + '/data/' + 'status_report.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.status_report);
-    const budget_file = concernsOnlyNewData
+    const budgetFile = concernsOnlyNewData
       ? rootPath + '/data/' + 'budget_report.xlsx'
-      : resolve(fileNames.xlsx_file_dir, fileNames.budget_file);
+      : resolve(fileNames.xlsx_file_dir, fileNames.budgetFile);
     const kpi_file_1 = concernsOnlyNewData
       ? rootPath + '/data/' + 'KPI-report_1.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.kpi_file_1);
 
     const workbookKPIFile = XLSX.readFile(kpi_file_1);
-    const workbookBudgetFile = XLSX.readFile(budget_file);
+    const workbookBudgetFile = XLSX.readFile(budgetFile);
     const workbookStatusReport = XLSX.readFile(status_report);
     const KPIAsJsonObject = workbookKPIFile.Sheets['Plan view'];
     const statusReportAsJsonObject = XLSX.utils.sheet_to_json(
@@ -400,7 +399,8 @@ export class XlsxParserService {
       const workbook = XLSX.readFile(main_file);
       const overview_object = workbook.Sheets['Status Overview'];
       // ------total budget
-      let totalBudget = 0;
+      const totalApprovedAndSpentBudget: TotalApprovedAndSpentBudget =
+        this.parseTotalApprovedBudgetAndSpentBudget();
       const allBudgetsOfMeasures: AllBudgetMeasures[] = [];
       Object.keys(overview_object).filter((key) => {
         if (key.includes('I')) {
@@ -410,7 +410,6 @@ export class XlsxParserService {
             const measureName = overview_object['D' + row]['v'];
             const budgetAsString = overview_object[key]['v'];
             const budget = budgetAsString * 1000;
-            totalBudget += budget;
             const currentBudget = {
               [measureName]: budget,
             };
@@ -483,7 +482,8 @@ export class XlsxParserService {
           budgetOfCurrentMeasureTimesAverageProgressOfItsArtefacts;
       }
       const progressOverviewBarResult =
-        sumAvgProgressTimesBudgetOfMEasures / totalBudget;
+        sumAvgProgressTimesBudgetOfMEasures /
+        totalApprovedAndSpentBudget.totalBudget;
       // ------KPI Progress
       const KPIprogressOfAllMeasures = this.getKPIProgressData(kpi_file_1);
       let sum = 0;
@@ -497,11 +497,15 @@ export class XlsxParserService {
           }
         });
       });
-      const KPIProgressResult = sum / totalBudget;
+      const KPIProgressResult = sum / totalApprovedAndSpentBudget.totalBudget;
       const updatedSheet = await excelSheet.update({
         kpiPlans,
         kpiDates,
-        totalBudget: totalBudget,
+        totalBudget: totalApprovedAndSpentBudget.totalBudget,
+        totalSpentBudget: totalApprovedAndSpentBudget.totalSpentBudget,
+        totalInvoicedBudget: totalApprovedAndSpentBudget.totalInvoicedBudget,
+        totalPlanBudget: totalApprovedAndSpentBudget.totalPlanBudget,
+        totalForecastBudget: totalApprovedAndSpentBudget.totalForecastBudget,
         overallStatus: overallStatus,
         progress: Math.round(progressOverviewBarResult * 100) / 100,
         kpiProgress: Math.round(KPIProgressResult * 100) / 100,
@@ -510,7 +514,11 @@ export class XlsxParserService {
       });
       result = {
         numberOfMeasures,
-        totalBudget,
+        totalBudget: totalApprovedAndSpentBudget.totalBudget,
+        totalSpentBudget: totalApprovedAndSpentBudget.totalSpentBudget,
+        totalInvoicedBudget: totalApprovedAndSpentBudget.totalInvoicedBudget,
+        totalPlanBudget: totalApprovedAndSpentBudget.totalPlanBudget,
+        totalForecastBudget: totalApprovedAndSpentBudget.totalForecastBudget,
         overallStatus,
         progressOverviewBarResult,
         KPIProgressResult,
@@ -547,7 +555,6 @@ export class XlsxParserService {
 
   // parse and save measures and corresponding artefacts
   async parse(concernsOnlyNewData: boolean): Promise<void> {
-    let result = 'parse failed';
     const focusAreaNames: { [key: string]: string } = {
       'Slow Down Hackers': 'SH',
       'Increase Detection': 'ID',
@@ -561,9 +568,9 @@ export class XlsxParserService {
     const status_report = concernsOnlyNewData
       ? rootPath + '/data/' + 'status_report.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.status_report);
-    const budget_file = concernsOnlyNewData
+    const budgetFile = concernsOnlyNewData
       ? rootPath + '/data/' + 'budget_report.xlsx'
-      : resolve(fileNames.xlsx_file_dir, fileNames.budget_file);
+      : resolve(fileNames.xlsx_file_dir, fileNames.budgetFile);
     const kpi_file_1 = concernsOnlyNewData
       ? rootPath + '/data/' + 'KPI-report_1.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.kpi_file_1);
@@ -577,7 +584,7 @@ export class XlsxParserService {
       // get raw data from files
       const workbook = XLSX.readFile(main_file, { cellDates: true });
       const workbookStatusReportFile = XLSX.readFile(status_report);
-      const workbookBudgetFile = XLSX.readFile(budget_file);
+      const workbookBudgetFile = XLSX.readFile(budgetFile);
       const kpiWorkbook = XLSX.readFile(kpi_file_1);
       const statusReportAsJsonObject = XLSX.utils.sheet_to_json(
         workbookStatusReportFile.Sheets[workbookStatusReportFile.SheetNames[0]],
@@ -591,7 +598,7 @@ export class XlsxParserService {
       // 'sheet' here means a sheet of the xlsx file i.e. a measure "M...""
       const sheet_name_list = workbook.SheetNames;
 
-      const monthlySpendingsColumnIdentifyers = [];
+      const monthlySpendingsColumnIdentifyers: string[] = [];
       // get the characters identifying the columns which hold the monthly spendings of measures in euro
       // like [ 'M', 'O', 'Q', 'S', 'U', 'W' ]
       Object.keys(budgetDetailsFileAsJsonObject).forEach((key) => {
@@ -608,12 +615,10 @@ export class XlsxParserService {
         }
       });
       // row 11 contains month names. One letter in alphabet each before their respective spendings column
+      const rowNumberOfMonthNames = '11';
       const monthNames = monthlySpendingsColumnIdentifyers.map((mn) => {
-        console.log(
-          budgetDetailsFileAsJsonObject[this.predecessorInAlphabet(mn) + '11'],
-        );
         return budgetDetailsFileAsJsonObject[
-          this.predecessorInAlphabet(mn) + '11'
+          this.predecessorInAlphabet(mn) + rowNumberOfMonthNames
         ]['v'];
       });
       concernsOnlyNewData
@@ -625,7 +630,7 @@ export class XlsxParserService {
             { _id: newlySavedExcelSheet._id },
             { monthNames: monthNames },
           );
-
+      const MeasureIDColumnIdentifierInBudgetDetail = 'C';
       for (let i = 0; i < sheet_name_list.length; i++) {
         const sheetName = sheet_name_list[i];
         // save measure to DB
@@ -635,15 +640,16 @@ export class XlsxParserService {
             (month) => {
               let sumOfThisMonth = 0;
               Object.keys(budgetDetailsFileAsJsonObject).forEach((key) => {
-                if (key.substring(0, 1) === 'C') {
+                if (
+                  key.substring(0, 1) ===
+                  MeasureIDColumnIdentifierInBudgetDetail
+                ) {
                   if (budgetDetailsFileAsJsonObject[key]['v'] === sheetName) {
                     const rowNr = key.substring(1, key.length);
-                    if (budgetDetailsFileAsJsonObject[month + rowNr]) {
-                      if (budgetDetailsFileAsJsonObject[month + rowNr]['v']) {
-                        sumOfThisMonth =
-                          sumOfThisMonth +
-                          budgetDetailsFileAsJsonObject[month + rowNr]['v'];
-                      }
+                    if (budgetDetailsFileAsJsonObject[month + rowNr]?.v) {
+                      sumOfThisMonth =
+                        sumOfThisMonth +
+                        budgetDetailsFileAsJsonObject[month + rowNr]['v'];
                     }
                   }
                 }
@@ -695,7 +701,7 @@ export class XlsxParserService {
               invoicedBudget = budgetFileAsJsonObject[i]['__EMPTY_26']
                 ? budgetFileAsJsonObject[i]['__EMPTY_26']
                 : 0;
-              contractBudget = budgetFileAsJsonObject[i]['__EMPTY_26']
+              contractBudget = budgetFileAsJsonObject[i]['__EMPTY_27']
                 ? budgetFileAsJsonObject[i]['__EMPTY_27']
                 : 0;
               forecastBudget = budgetFileAsJsonObject[i]['__EMPTY_28']
@@ -855,7 +861,6 @@ export class XlsxParserService {
                   { $push: { measures: savedMeasure } },
                 );
             if (updatedMeasure) {
-              result = 'updated measure ' + sheetName;
               // get artefacts of this measure and add it to measure in DB
               const artefacts =
                 this.getArtefactsFromLinesArray(xlsxFileAsJsonObject);
@@ -1101,13 +1106,13 @@ export class XlsxParserService {
     const status_report = concernsOnlyNewData
       ? rootPath + '/data/' + 'status_report.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.status_report);
-    const budget_file = concernsOnlyNewData
+    const budgetFile = concernsOnlyNewData
       ? rootPath + '/data/' + 'budget_report.xlsx'
-      : resolve(fileNames.xlsx_file_dir, fileNames.budget_file);
+      : resolve(fileNames.xlsx_file_dir, fileNames.budgetFile);
     const kpi_file_1 = concernsOnlyNewData
       ? rootPath + '/data/' + 'KPI-report_1.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.kpi_file_1);
-    const workbook = XLSX.readFile(budget_file);
+    const workbook = XLSX.readFile(budgetFile);
     const overview_object = workbook.Sheets['1. Overview'];
     const detailes_object = workbook.Sheets['2. Detailed view'];
     // M > 5,  D measure names
@@ -1278,5 +1283,65 @@ export class XlsxParserService {
     } else {
       return inputCharacter;
     }
+  }
+
+  parseTotalApprovedBudgetAndSpentBudget(): TotalApprovedAndSpentBudget {
+    // Structural Constraint: Total Budget in column "M" in first line under measure lines
+    // total spent budget in column AB in same line
+    // total invoiced budget in column AC in same line
+    // total plan budget in column AD in same line
+    // total forecast budget in column AE in same line
+    const totalBudgetColumnIdentifier = 'M';
+    const measureIDColumnIdentifier = 'D';
+    const totalSpentBudgetColumnIdentifier = 'AB';
+    const totalInvoicedBudgetColumnIdentifier = 'AC';
+    const totalPlanBudgetColumnIdentifier = 'AD';
+    const totalForecastBudgetColumnIdentifier = 'AE';
+    const budgetFile = resolve(fileNames.xlsx_file_dir, fileNames.budgetFile);
+    const workbookBudgetFile_1 = XLSX.readFile(budgetFile);
+    // List of budget file cells as objects with identifiers like "D22"
+    const budgetReoportAsJsonObject =
+      workbookBudgetFile_1.Sheets[workbookBudgetFile_1.SheetNames[0]];
+    const cellKeysOfMeasureIDs = [];
+    Object.keys(budgetReoportAsJsonObject).forEach((key) => {
+      if (key.substring(0, 1) === measureIDColumnIdentifier) {
+        if (
+          budgetReoportAsJsonObject[key].v.substring(0, 1) ===
+          totalBudgetColumnIdentifier
+        ) {
+          cellKeysOfMeasureIDs.push(key);
+        }
+      }
+    });
+    const lineOfLastMeasure: number = parseInt(
+      cellKeysOfMeasureIDs[cellKeysOfMeasureIDs.length - 1].split('D')[1],
+    );
+    const totalBudget =
+      budgetReoportAsJsonObject[
+        totalBudgetColumnIdentifier + (lineOfLastMeasure + 1)
+      ].v;
+    const totalSpentBudget =
+      budgetReoportAsJsonObject[
+        totalSpentBudgetColumnIdentifier + (lineOfLastMeasure + 1)
+      ].v;
+    const totalInvoicedBudget =
+      budgetReoportAsJsonObject[
+        totalInvoicedBudgetColumnIdentifier + (lineOfLastMeasure + 1)
+      ].v;
+    const totalPlanBudget =
+      budgetReoportAsJsonObject[
+        totalPlanBudgetColumnIdentifier + (lineOfLastMeasure + 1)
+      ].v;
+    const totalForecastBudget =
+      budgetReoportAsJsonObject[
+        totalForecastBudgetColumnIdentifier + (lineOfLastMeasure + 1)
+      ].v;
+    return {
+      totalBudget,
+      totalSpentBudget,
+      totalInvoicedBudget,
+      totalPlanBudget,
+      totalForecastBudget,
+    };
   }
 }

@@ -64,33 +64,35 @@ export type Artefact = {
   work: string;
 };
 
-export type Overview = {
+export interface OverviewBase {
+  totalBudget: number;
+  totalSpentBudget: number;
+  totalInvoicedBudget: number;
+  totalPlanBudget: number;
+  totalForecastBudget: number;
+  overallStatus: number;
+  statusDate: string;
+  budgetDate: string;
+}
+export interface InitialOverview extends OverviewBase {
+  numberOfMeasures: number;
+  progressOverviewBarResult: number;
+  KPIProgressResult: number;
+}
+
+export interface Overview extends OverviewBase {
   _id: string;
   name: string;
   measures: string[];
   kpiProgress: number;
-  overallStatus: number;
   progress: number;
-  totalBudget: number;
-  statusDate: string;
-  budgetDate: string;
-};
+}
 
 export type Budget = {
   _id: string;
   monthlySpendings: number[];
   approvedBudgetPerMonth: number;
   year: number;
-};
-
-export type InitialOverview = {
-  numberOfMeasures: number;
-  totalBudget: number;
-  overallStatus: number;
-  progressOverviewBarResult: number;
-  KPIProgressResult: number;
-  statusDate: string;
-  budgetDate: string;
 };
 
 export type ParseOverview = {
@@ -133,4 +135,12 @@ export type PastBudget = {
 export interface ExistingFiles {
   filesInBuffer: Upload[];
   filesAlreadyParsed: string[];
+}
+
+export interface TotalApprovedAndSpentBudget {
+  totalBudget: number;
+  totalSpentBudget: number;
+  totalInvoicedBudget: number;
+  totalPlanBudget: number;
+  totalForecastBudget: number;
 }

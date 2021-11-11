@@ -10,8 +10,7 @@ import { Budget } from '../schemas/budget.schema';
 import { BudgetTEMP } from '../schemas/budgetTEMP.schema';
 import { Model } from 'mongoose';
 import '../types';
-import '../types';
-import { InitialOverview, KpiProgressData, PastBudget, Risk, SheetType } from '../types';
+import { InitialOverview, KpiProgressData, PastBudget, Risk, SheetType, TotalApprovedAndSpentBudget } from '../types';
 import { Upload } from '../schemas/upload.schema';
 export declare class XlsxParserService {
     private artefactModel;
@@ -45,4 +44,5 @@ export declare class XlsxParserService {
     formatRiskDate(input: string): string;
     getRisk(line: number, xlsxFileAsJsonObject: SheetType[]): Risk;
     predecessorInAlphabet(inputCharacter: string): string;
+    parseTotalApprovedBudgetAndSpentBudget(): TotalApprovedAndSpentBudget;
 }

@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const xlsxParser_module_1 = require("./xlsxParser/xlsxParser.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const api_module_1 = require("./api/api.module");
-const simpleAuth_module_1 = require("./simpleAuth/simpleAuth.module");
 const platform_express_1 = require("@nestjs/platform-express");
 const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
@@ -23,10 +22,9 @@ AppModule = __decorate([
                 dest: './uploads',
             }),
             config_1.ConfigModule.forRoot(),
-            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_CONNECTION_DEV_3),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGO_URI),
             xlsxParser_module_1.XlsxParserModule,
             api_module_1.ApiModule,
-            simpleAuth_module_1.SimpleAuthModule,
         ],
     })
 ], AppModule);

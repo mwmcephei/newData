@@ -5,6 +5,10 @@ export declare type SheetDocument = Sheet & Document;
 export declare class Sheet {
     name: string;
     totalBudget: number;
+    totalSpentBudget: number;
+    totalInvoicedBudget: number;
+    totalPlanBudget: number;
+    totalForecastBudget: number;
     overallStatus: number;
     progress: number;
     monthNames: string[];

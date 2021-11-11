@@ -18,7 +18,7 @@ exports.fileNames = {
     xlsx_file_dir,
     main_file: 'realData/' + exports.fileNamesWithoutExtension[3] + '.xlsx',
     kpi_file_1: 'realData/' + exports.fileNamesWithoutExtension[1] + '.xlsx',
-    budget_file: 'realData/' + exports.fileNamesWithoutExtension[0] + '.xlsx',
+    budgetFile: 'realData/' + exports.fileNamesWithoutExtension[0] + '.xlsx',
     status_report: 'realData/' + exports.fileNamesWithoutExtension[2] + '.xlsx',
     budget_past: 'realData/' + exports.fileNamesWithoutExtension[4] + '.xlsx',
 };

@@ -4,7 +4,7 @@ export declare const fileNames: {
     xlsx_file_dir: string;
     main_file: string;
     kpi_file_1: string;
-    budget_file: string;
+    budgetFile: string;
     status_report: string;
     budget_past: string;
 };

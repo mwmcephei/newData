@@ -1,0 +1,4 @@
+FROM caddy
+EXPOSE 2222
+
+CMD caddy reverse-proxy --from $DOMAIN --to "$BACKEND_URL"

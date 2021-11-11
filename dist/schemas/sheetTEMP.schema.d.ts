@@ -5,6 +5,10 @@ export declare type SheetTEMPDocument = SheetTEMP & Document;
 export declare class SheetTEMP {
     name: string;
     totalBudget: number;
+    totalSpentBudget: number;
+    totalInvoicedBudget: number;
+    totalPlanBudget: number;
+    totalForecastBudget: number;
     overallStatus: number;
     progress: number;
     kpiPlans: string[];
