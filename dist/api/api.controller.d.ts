@@ -8,6 +8,7 @@ export declare class SetNotificationDto {
 export declare class ApiController {
     private readonly apiService;
     constructor(apiService: ApiService);
+    memory(): string;
     getMeasure(params: any): Promise<import("../schemas/measure.schema").Measure>;
     getArtefactsOfMeasure(params: any): Promise<import("../schemas/artefact.schema").Artefact[]>;
     getMeasureID(params: any): Promise<string>;

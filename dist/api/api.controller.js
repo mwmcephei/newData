@@ -25,6 +25,11 @@ let ApiController = class ApiController {
     constructor(apiService) {
         this.apiService = apiService;
     }
+    memory() {
+        const used = process.memoryUsage().heapUsed / 1024 / 1024;
+        console.log(`The script uses approximately ${used} MB`);
+        return "test";
+    }
     getMeasure(params) {
         return this.apiService.getMeasure(params.measureID);
     }
@@ -79,6 +84,12 @@ let ApiController = class ApiController {
         return this.apiService.handleFileUpload(file.originalname, targetFileName);
     }
 };
+__decorate([
+    (0, common_1.Get)('memory'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ApiController.prototype, "memory", null);
 __decorate([
     (0, common_1.Get)('measure/:measureID'),
     __param(0, (0, common_1.Param)()),
