@@ -21,16 +21,7 @@ export class SetNotificationDto {
 
 @Controller('api')
 export class ApiController {
-  constructor(private readonly apiService: ApiService) { }
-
-  // returns measure wth a certain ID
-  @Get('memory')
-  memory() {
-    const used = process.memoryUsage().heapUsed / 1024 / 1024;
-    console.log(`The script uses approximately ${used} MB`);
-    return "test";
-  }
-
+  constructor(private readonly apiService: ApiService) {}
 
   // returns measure wth a certain ID
   @Get('measure/:measureID')

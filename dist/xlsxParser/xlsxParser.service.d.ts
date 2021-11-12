@@ -33,7 +33,7 @@ export declare class XlsxParserService {
     setsAreEqual(as: Set<string>, bs: Set<string>): boolean;
     moveFilesAfterParsing(): Promise<void>;
     createOverview(concernsOnlyNewData: boolean): Promise<InitialOverview>;
-    getKPIProgressData(kpiFile: string): KpiProgressData[];
+    getKPIProgressData(kpiFile: string, numberOfMeasures: number): KpiProgressData[];
     parse(concernsOnlyNewData: boolean): Promise<void>;
     getArtefactsFromLinesArray(sheet: SheetType[]): SheetType[];
     parse_overview(concernsOnlyNewData: any): Promise<void>;
@@ -45,4 +45,6 @@ export declare class XlsxParserService {
     getRisk(line: number, xlsxFileAsJsonObject: SheetType[]): Risk;
     predecessorInAlphabet(inputCharacter: string): string;
     parseTotalApprovedBudgetAndSpentBudget(): TotalApprovedAndSpentBudget;
+    overallProgress(concernsOnlyNewData: boolean): Promise<number>;
+    filterNumberFromString(input: string): number;
 }

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Sheet } from '../schemas/sheet.schema';
-import { SheetTEMP } from '../schemas/sheetTEMP.schema';
-import { Measure } from '../schemas/measure.schema';
-import { MeasureTEMP } from '../schemas/measureTEMP.schema';
+import { Sheet, SheetDocument } from '../schemas/sheet.schema';
+import { SheetTEMP, SheetTEMPDocument } from '../schemas/sheetTEMP.schema';
+import { Measure, MeasureDocument } from '../schemas/measure.schema';
+import { MeasureTEMP, MeasureTEMPDocument } from '../schemas/measureTEMP.schema';
 import { ArtefactTEMP } from '../schemas/artefactTEMP.schema';
 import { Artefact } from '../schemas/artefact.schema';
 import { Notification } from '../schemas/notification.schema';
 import { NotificationStatus } from '../schemas/notificationStatus.schema';
-import { Budget } from '../schemas/budget.schema';
-import { BudgetTEMP } from '../schemas/budgetTEMP.schema';
+import { Budget, BudgetDocument } from '../schemas/budget.schema';
+import { BudgetTEMP, BudgetTEMPDocument } from '../schemas/budgetTEMP.schema';
 import { Model } from 'mongoose';
 import { resolve } from 'path';
 import * as XLSX from 'xlsx';
@@ -58,7 +58,7 @@ export class XlsxParserService {
     @InjectModel('NotificationStatus')
     private notificationStatusModel: Model<NotificationStatus>,
     @InjectModel('Upload') private uploadModel: Model<Upload>,
-  ) {}
+  ) { }
 
   async startParsingForAllUploadedXlsxFiles(): Promise<void> {
     await this.uploadModel.deleteMany({}); // clear info about which files are currently in buffer
@@ -337,6 +337,7 @@ export class XlsxParserService {
   }
 
   async createOverview(concernsOnlyNewData: boolean): Promise<InitialOverview> {
+    const standardAccessKey = 'v';
     const main_file = concernsOnlyNewData
       ? rootPath + '/data/' + 'test_data.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.main_file);
@@ -391,7 +392,7 @@ export class XlsxParserService {
       plan3.length > 0 ? plan3.substring(plan3.length - 7, plan3.length) : '',
     ];
     let result: InitialOverview;
-    const excelSheet = concernsOnlyNewData
+    const excelSheet: SheetDocument | SheetTEMPDocument = concernsOnlyNewData
       ? await this.sheetTEMPModel.findOne()
       : await this.sheetModel.findOne();
     if (excelSheet) {
@@ -401,29 +402,18 @@ export class XlsxParserService {
       // ------total budget
       const totalApprovedAndSpentBudget: TotalApprovedAndSpentBudget =
         this.parseTotalApprovedBudgetAndSpentBudget();
-      const allBudgetsOfMeasures: AllBudgetMeasures[] = [];
-      Object.keys(overview_object).filter((key) => {
-        if (key.includes('I')) {
-          // column 'I' of xlsx sheet
-          const row = parseInt(key.substring(1));
-          if (row > 4) {
-            const measureName = overview_object['D' + row]['v'];
-            const budgetAsString = overview_object[key]['v'];
-            const budget = budgetAsString * 1000;
-            const currentBudget = {
-              [measureName]: budget,
-            };
-            allBudgetsOfMeasures.push(currentBudget);
-          }
-        }
-      });
+      const measures: Measure[] = concernsOnlyNewData
+        ? await this.measureTEMPModel.find()
+        : await this.measureModel.find();
       // ------overall status
       const allRisksBudgetsAndArtefacts = [];
       Object.keys(overview_object).filter((key) => {
         if (key.includes('P')) {
           const row = parseInt(key.substring(1));
           if (row > 4) {
-            allRisksBudgetsAndArtefacts.push(overview_object[key]['v']);
+            allRisksBudgetsAndArtefacts.push(
+              overview_object[key][standardAccessKey],
+            );
           }
         }
       });
@@ -431,7 +421,9 @@ export class XlsxParserService {
         if (key.includes('Q')) {
           const row = parseInt(key.substring(1));
           if (row > 4) {
-            allRisksBudgetsAndArtefacts.push(overview_object[key]['v']);
+            allRisksBudgetsAndArtefacts.push(
+              overview_object[key][standardAccessKey],
+            );
           }
         }
       });
@@ -439,7 +431,9 @@ export class XlsxParserService {
         if (key.includes('R')) {
           const row = parseInt(key.substring(1));
           if (row > 4) {
-            allRisksBudgetsAndArtefacts.push(overview_object[key]['v']);
+            allRisksBudgetsAndArtefacts.push(
+              overview_object[key][standardAccessKey],
+            );
           }
         }
       });
@@ -449,55 +443,23 @@ export class XlsxParserService {
           overallStatus = a;
         }
       });
-      // ------Progress Overview:  sum over measures(avgProgress * measureBudget) / totalBudget
-      // get all measures, get artefacts of each measure
-      let sumAvgProgressTimesBudgetOfMEasures = 0;
-      for (let m = 0; m < excelSheet.measures.length; m++) {
-        const measure = concernsOnlyNewData
-          ? await (await this.measureTEMPModel.findById(excelSheet.measures[m]))
-              .populate('artefacts')
-              .execPopulate()
-          : await (await this.measureModel.findById(excelSheet.measures[m]))
-              .populate('artefacts')
-              .execPopulate();
-        let avgProgressOfArtefacts = 0;
-        measure.artefacts.map((art) => {
-          avgProgressOfArtefacts += art.progress;
-        });
-        avgProgressOfArtefacts =
-          avgProgressOfArtefacts / measure.artefacts.length;
-        let budgetOfCurrentMeasureTimesAverageProgressOfItsArtefacts = 0;
-        allBudgetsOfMeasures.map((item) => {
-          if (item[measure.title]) {
-            if (isNaN(avgProgressOfArtefacts)) {
-              budgetOfCurrentMeasureTimesAverageProgressOfItsArtefacts =
-                item[measure.title];
-            } else {
-              budgetOfCurrentMeasureTimesAverageProgressOfItsArtefacts =
-                item[measure.title] * avgProgressOfArtefacts;
-            }
-          }
-        });
-        sumAvgProgressTimesBudgetOfMEasures +=
-          budgetOfCurrentMeasureTimesAverageProgressOfItsArtefacts;
-      }
-      const progressOverviewBarResult =
-        sumAvgProgressTimesBudgetOfMEasures /
-        totalApprovedAndSpentBudget.totalBudget;
+      // ------overallProgress:
+      // sum over Measures (sum over Measure's Artefact(artefactProgress * ArtefactBudget) / Measure's Budget) / number of measures
+      const overallProgress: number = await this.overallProgress(
+        concernsOnlyNewData,
+      );
       // ------KPI Progress
-      const KPIprogressOfAllMeasures = this.getKPIProgressData(kpi_file_1);
-      let sum = 0;
-      KPIprogressOfAllMeasures.map((item) => {
-        allBudgetsOfMeasures.map((budgetOfMeasure) => {
-          //       if (budgetOfMeasure[item.measureName]) {
-          if (budgetOfMeasure[Object.keys(budgetOfMeasure)[0]]) {
-            const tempx =
-              item.progress * budgetOfMeasure[Object.keys(budgetOfMeasure)[0]];
-            sum += tempx;
-          }
-        });
+      const kpiProgressOfAllMeasures = this.getKPIProgressData(
+        kpi_file_1,
+        numberOfMeasures,
+      );
+      let sumKPIprogressOfAllMeasures = 0;
+      kpiProgressOfAllMeasures.forEach((item) => {
+        sumKPIprogressOfAllMeasures =
+          sumKPIprogressOfAllMeasures + item.progress;
       });
-      const KPIProgressResult = sum / totalApprovedAndSpentBudget.totalBudget;
+      const KPIProgressResult =
+        sumKPIprogressOfAllMeasures / kpiProgressOfAllMeasures.length;
       const updatedSheet = await excelSheet.update({
         kpiPlans,
         kpiDates,
@@ -507,7 +469,7 @@ export class XlsxParserService {
         totalPlanBudget: totalApprovedAndSpentBudget.totalPlanBudget,
         totalForecastBudget: totalApprovedAndSpentBudget.totalForecastBudget,
         overallStatus: overallStatus,
-        progress: Math.round(progressOverviewBarResult * 100) / 100,
+        progress: overallProgress,
         kpiProgress: Math.round(KPIProgressResult * 100) / 100,
         statusDate,
         budgetDate,
@@ -520,7 +482,7 @@ export class XlsxParserService {
         totalPlanBudget: totalApprovedAndSpentBudget.totalPlanBudget,
         totalForecastBudget: totalApprovedAndSpentBudget.totalForecastBudget,
         overallStatus,
-        progressOverviewBarResult,
+        progressOverviewBarResult: overallProgress,
         KPIProgressResult,
         statusDate,
         budgetDate,
@@ -530,24 +492,30 @@ export class XlsxParserService {
   }
 
   // aux function for createOverview()
-  getKPIProgressData(kpiFile: string): KpiProgressData[] {
+  getKPIProgressData(
+    kpiFile: string,
+    numberOfMeasures: number,
+  ): KpiProgressData[] {
+    const standardAccessKey = 'v';
+    const actualsColumnIdentifier = 'G';
+    const targetColumnIdentifier = 'H';
+    const measureNameColumnIdentifier = 'D';
     const workbook = XLSX.readFile(kpiFile);
     const overview_object = workbook.Sheets['Plan view'];
     // D:measure name, G current progress, H target progress
-    const numberOfRows = 22; // TO DO: get number of rows programmatically    ---   HARDCODED
     const result: KpiProgressData[] = [];
-    for (let i = 1; i <= numberOfRows; i++) {
-      const keyMeasureName = 'D' + (4 + i); // first entry at row 4
-      const keyActualProgress = 'G' + (4 + i);
-      const keyTargetProgress = 'H' + (4 + i);
+    for (let i = 1; i <= numberOfMeasures; i++) {
+      const keyMeasureName: string = measureNameColumnIdentifier + (4 + i); // first entry at row 4
+      const keyActualProgress: string = actualsColumnIdentifier + (4 + i);
+      const keyTargetProgress: string = targetColumnIdentifier + (4 + i);
+      const progress: number =
+        overview_object[keyTargetProgress][standardAccessKey] === 0
+          ? 0
+          : (overview_object[keyActualProgress][standardAccessKey] /
+            overview_object[keyTargetProgress][standardAccessKey]) * 100
       result.push({
-        measureName: overview_object[keyMeasureName]['v'],
-        progress:
-          Math.round(
-            (overview_object[keyActualProgress]['v'] /
-              overview_object[keyTargetProgress]['v']) *
-              100,
-          ) / 100,
+        measureName: overview_object[keyMeasureName][standardAccessKey],
+        progress,
       });
     }
     return result;
@@ -555,6 +523,7 @@ export class XlsxParserService {
 
   // parse and save measures and corresponding artefacts
   async parse(concernsOnlyNewData: boolean): Promise<void> {
+    const standardAccessKey = 'v';
     const focusAreaNames: { [key: string]: string } = {
       'Slow Down Hackers': 'SH',
       'Increase Detection': 'ID',
@@ -606,7 +575,7 @@ export class XlsxParserService {
         const split = tmp.split('_');
         const target = split[split.length - 1];
         if (parseInt(target) == 12) {
-          const x = budgetDetailsFileAsJsonObject[key]['v'];
+          const x = budgetDetailsFileAsJsonObject[key][standardAccessKey];
           if (x.substring(0, 3) === 'EUR' && x.length < 5) {
             monthlySpendingsColumnIdentifyers.push(
               key.substring(0, key.length - 2),
@@ -619,17 +588,17 @@ export class XlsxParserService {
       const monthNames = monthlySpendingsColumnIdentifyers.map((mn) => {
         return budgetDetailsFileAsJsonObject[
           this.predecessorInAlphabet(mn) + rowNumberOfMonthNames
-        ]['v'];
+        ][standardAccessKey];
       });
       concernsOnlyNewData
         ? await this.sheetTEMPModel.updateOne(
-            { _id: newlySavedExcelSheet._id },
-            { monthNames: monthNames },
-          )
+          { _id: newlySavedExcelSheet._id },
+          { monthNames: monthNames },
+        )
         : await this.sheetModel.updateOne(
-            { _id: newlySavedExcelSheet._id },
-            { monthNames: monthNames },
-          );
+          { _id: newlySavedExcelSheet._id },
+          { monthNames: monthNames },
+        );
       const MeasureIDColumnIdentifierInBudgetDetail = 'C';
       for (let i = 0; i < sheet_name_list.length; i++) {
         const sheetName = sheet_name_list[i];
@@ -644,12 +613,17 @@ export class XlsxParserService {
                   key.substring(0, 1) ===
                   MeasureIDColumnIdentifierInBudgetDetail
                 ) {
-                  if (budgetDetailsFileAsJsonObject[key]['v'] === sheetName) {
+                  if (
+                    budgetDetailsFileAsJsonObject[key][standardAccessKey] ===
+                    sheetName
+                  ) {
                     const rowNr = key.substring(1, key.length);
                     if (budgetDetailsFileAsJsonObject[month + rowNr]?.v) {
                       sumOfThisMonth =
                         sumOfThisMonth +
-                        budgetDetailsFileAsJsonObject[month + rowNr]['v'];
+                        budgetDetailsFileAsJsonObject[month + rowNr][
+                        standardAccessKey
+                        ];
                     }
                   }
                 }
@@ -846,20 +820,20 @@ export class XlsxParserService {
             monthlySpendings,
             help,
           };
-          const measure = concernsOnlyNewData
+          const measure: MeasureDocument | MeasureTEMPDocument = concernsOnlyNewData
             ? new this.measureTEMPModel(newMeasure)
             : new this.measureModel(newMeasure);
           const savedMeasure = await measure.save();
           if (savedMeasure) {
             const updatedMeasure = concernsOnlyNewData
               ? await this.sheetTEMPModel.updateOne(
-                  { _id: newlySavedExcelSheet._id },
-                  { $push: { measures: savedMeasure } },
-                )
+                { _id: newlySavedExcelSheet._id },
+                { $push: { measures: savedMeasure } },
+              )
               : await this.sheetModel.updateOne(
-                  { _id: newlySavedExcelSheet._id },
-                  { $push: { measures: savedMeasure } },
-                );
+                { _id: newlySavedExcelSheet._id },
+                { $push: { measures: savedMeasure } },
+              );
             if (updatedMeasure) {
               // get artefacts of this measure and add it to measure in DB
               const artefacts =
@@ -883,13 +857,13 @@ export class XlsxParserService {
                   savedArtefact_IDs.push(savedArtefact._id);
                   concernsOnlyNewData
                     ? await this.measureTEMPModel.updateOne(
-                        { _id: savedMeasure._id },
-                        { $push: { artefacts: savedArtefact } },
-                      )
+                      { _id: savedMeasure._id },
+                      { $push: { artefacts: savedArtefact } },
+                    )
                     : await this.measureModel.updateOne(
-                        { _id: savedMeasure._id },
-                        { $push: { artefacts: savedArtefact } },
-                      );
+                      { _id: savedMeasure._id },
+                      { $push: { artefacts: savedArtefact } },
+                    );
                 }
               });
             }
@@ -911,13 +885,13 @@ export class XlsxParserService {
           if (parseInt(firstItem) < 10 && Object.keys(line).length > 2) {
             return line;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     });
   }
-
   // adds status info to measures
   async parse_overview(concernsOnlyNewData): Promise<void> {
+    const standardAccessKey = 'v'
     const main_file = concernsOnlyNewData
       ? rootPath + '/data/' + 'test_data.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.main_file);
@@ -931,7 +905,7 @@ export class XlsxParserService {
         if (row > 4) {
           risks.push({
             row,
-            risk: overview_object[key]['v'],
+            risk: overview_object[key][standardAccessKey],
           });
         }
       }
@@ -943,7 +917,7 @@ export class XlsxParserService {
         if (row > 4) {
           budgets.push({
             row,
-            budget: overview_object[key]['v'],
+            budget: overview_object[key][standardAccessKey],
           });
         }
       }
@@ -955,7 +929,7 @@ export class XlsxParserService {
         if (row > 4) {
           artefacts.push({
             row,
-            artefact: overview_object[key]['v'],
+            artefact: overview_object[key][standardAccessKey],
           });
         }
       }
@@ -973,27 +947,28 @@ export class XlsxParserService {
           };
           concernsOnlyNewData
             ? await this.measureTEMPModel.updateOne(
-                { title: addToResult.name },
-                {
-                  risk: addToResult.risk,
-                  budget: addToResult.budget,
-                  artefact: addToResult.artefact,
-                },
-              )
+              { title: addToResult.name },
+              {
+                risk: addToResult.risk,
+                budget: addToResult.budget,
+                artefact: addToResult.artefact,
+              },
+            )
             : await this.measureModel.updateOne(
-                { title: addToResult.name },
-                {
-                  risk: addToResult.risk,
-                  budget: addToResult.budget,
-                  artefact: addToResult.artefact,
-                },
-              );
+              { title: addToResult.name },
+              {
+                risk: addToResult.risk,
+                budget: addToResult.budget,
+                artefact: addToResult.artefact,
+              },
+            );
         }
       }
     });
   }
 
   async parseKPI(concernsOnlyNewData): Promise<string> {
+    const standardAccessKey = 'v';
     const kpi_file_1 = concernsOnlyNewData
       ? rootPath + '/data/' + 'KPI-report_1.xlsx'
       : resolve(fileNames.xlsx_file_dir, fileNames.kpi_file_1);
@@ -1006,14 +981,14 @@ export class XlsxParserService {
         const row = parseInt(key.substring(1));
         if (row > 4) {
           rowsOfMeasures.push({
-            measureName: overview_object[key]['v'],
+            measureName: overview_object[key][standardAccessKey],
             row,
           });
         }
       }
     });
     // get measures from DB
-    const measures = concernsOnlyNewData
+    const measures: Measure[] | MeasureTEMP[] = concernsOnlyNewData
       ? await this.measureTEMPModel.find()
       : await this.measureModel.find();
     measures.map(async (measure) => {
@@ -1033,37 +1008,37 @@ export class XlsxParserService {
         if (key.includes('G')) {
           const row = parseInt(key.substring(1));
           if (row == rowOfThisMeasure) {
-            actuals = overview_object[key]['v'];
+            actuals = overview_object[key][standardAccessKey];
           }
         }
         if (key.includes('H')) {
           const row = parseInt(key.substring(1));
           if (row == rowOfThisMeasure) {
-            target = overview_object[key]['v'];
+            target = overview_object[key][standardAccessKey];
           }
         }
         if (key.includes('J')) {
           const row = parseInt(key.substring(1));
           if (row == rowOfThisMeasure) {
-            plan1 = overview_object[key]['v'];
+            plan1 = overview_object[key][standardAccessKey];
           }
         }
         if (key.includes('K')) {
           const row = parseInt(key.substring(1));
           if (row == rowOfThisMeasure) {
-            plan2 = overview_object[key]['v'];
+            plan2 = overview_object[key][standardAccessKey];
           }
         }
         if (key.includes('L')) {
           const row = parseInt(key.substring(1));
           if (row == rowOfThisMeasure) {
-            plan3 = overview_object[key]['v'];
+            plan3 = overview_object[key][standardAccessKey];
           }
         }
         if (key.includes('M')) {
           const row = parseInt(key.substring(1));
           if (row == rowOfThisMeasure) {
-            plan4 = overview_object[key]['v'];
+            plan4 = overview_object[key][standardAccessKey];
           }
         }
       });
@@ -1099,6 +1074,7 @@ export class XlsxParserService {
   }
 
   async parseBudgetMonths(concernsOnlyNewData): Promise<string> {
+    const standardAccessKey = 'v'
     let result = 'parseBudgetMonths failed';
     const main_file = concernsOnlyNewData
       ? rootPath + '/data/' + 'test_data.xlsx'
@@ -1123,7 +1099,7 @@ export class XlsxParserService {
         // wip
       }
     });
-    const totalApprovedBudget = overview_object['M36']['v']; // hardcoded
+    const totalApprovedBudget = overview_object['M36'][standardAccessKey]; // hardcoded
     // get month columns EUR1 EUR2 .... row 12
     const month_columns = [];
     Object.keys(detailes_object).map((key) => {
@@ -1131,7 +1107,7 @@ export class XlsxParserService {
       const split = tmp.split('_');
       const target = split[split.length - 1];
       if (parseInt(target) == 12) {
-        const x = detailes_object[key]['v'];
+        const x = detailes_object[key][standardAccessKey];
         if (x.substring(0, 3) === 'EUR' && x.length < 5) {
           month_columns.push(key.substring(0, key.length - 2));
         }
@@ -1140,25 +1116,29 @@ export class XlsxParserService {
     //  month_columns = [ 'M', 'O', 'Q', 'S', 'U', 'W' ]   columns of months in "Detailed view"
     const sumRow = 333; // 281 //286 // sum of all measures spent budget per month in this row in "Detailed view"  HARDCODED
     const monthlySpendings = month_columns.map((month, index) => {
-      return Math.round(detailes_object[month + '' + sumRow]['v'] * 100) / 100; // M286
+      return (
+        Math.round(
+          detailes_object[month + '' + sumRow][standardAccessKey] * 100,
+        ) / 100
+      ); // M286
     });
     // TO DO: instead sum up monthly spendings of measures
     const approvedBudgetPerMonth =
       Math.round((totalApprovedBudget / month_columns.length) * 100) / 100;
     const year = new Date().getFullYear(); // TO DO: year is currently assumed to be this year (Datetime). Improve by parsing from file
-    const newBudget = concernsOnlyNewData
+    const newBudget: BudgetDocument | BudgetTEMPDocument = concernsOnlyNewData
       ? new this.budgetTEMPModel({
-          monthlySpendings,
-          approvedBudgetPerMonth,
-          year,
-        })
+        monthlySpendings,
+        approvedBudgetPerMonth,
+        year,
+      })
       : new this.budgetModel({
-          monthlySpendings,
-          approvedBudgetPerMonth,
-          year,
-        });
+        monthlySpendings,
+        approvedBudgetPerMonth,
+        year,
+      });
     await newBudget.save();
-    const excelSheet = concernsOnlyNewData
+    const excelSheet: SheetDocument | SheetTEMPDocument = concernsOnlyNewData
       ? await this.sheetTEMPModel.findOne()
       : await this.sheetModel.findOne();
     if (excelSheet) {
@@ -1343,5 +1323,41 @@ export class XlsxParserService {
       totalPlanBudget,
       totalForecastBudget,
     };
+  }
+
+  async overallProgress(concernsOnlyNewData: boolean): Promise<number> {
+    const excelSheet: Sheet | SheetTEMP = concernsOnlyNewData
+      ? await this.sheetTEMPModel.findOne()
+      : await this.sheetModel.findOne();
+    let accumulatorOverMeasures = 0;
+    for (let m = 0; m < excelSheet.measures.length; m++) {
+      const measure: Measure | MeasureTEMP = concernsOnlyNewData
+        ? await (await this.measureTEMPModel.findById(excelSheet.measures[m]))
+          .populate('artefacts')
+          .execPopulate()
+        : await (await this.measureModel.findById(excelSheet.measures[m]))
+          .populate('artefacts')
+          .execPopulate();
+      let sumArtefactsProduct = 0;
+      measure.artefacts.forEach((art) => {
+        const progressTimesBudget = isNaN(art.progress)
+          ? 0
+          : art.progress * this.filterNumberFromString(art.budget);
+        sumArtefactsProduct = sumArtefactsProduct + progressTimesBudget;
+      });
+      accumulatorOverMeasures =
+        accumulatorOverMeasures +
+        sumArtefactsProduct / measure.budgetDetail.totalApprovedBudget;
+    }
+    return accumulatorOverMeasures / excelSheet.measures.length;
+  }
+
+  filterNumberFromString(input: string): number {
+    const onlyNumbers = input.replace(/[^\d.-]/g, '');
+    if (onlyNumbers) {
+      return parseInt(onlyNumbers) * 1000;
+    } else {
+      return 0;
+    }
   }
 }
